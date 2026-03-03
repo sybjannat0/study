@@ -1,0 +1,249 @@
+/* ============================================
+   Admin Panel - Modern PIN Protected
+   ============================================ */
+
+.admin-section {
+    padding: 0;
+    overflow: hidden;
+    display: block !important;
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #d946ef 100%);
+    color: white;
+}
+
+.admin-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.admin-icon i {
+    width: 28px;
+    height: 28px;
+}
+
+.admin-info h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+}
+
+.admin-info p {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Lock Screen */
+.admin-lock-screen {
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.lock-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.lock-icon i {
+    width: 28px;
+    height: 28px;
+    color: #6b7280;
+}
+
+.lock-text {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0;
+    text-align: center;
+}
+
+.pin-input-container {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 240px;
+}
+
+.pin-input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 8px;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.pin-input:focus {
+    outline: none;
+    border-color: #7c3aed;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+.pin-input::placeholder {
+    letter-spacing: 4px;
+    color: #d1d5db;
+}
+
+.unlock-btn {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+.unlock-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+}
+
+.unlock-btn:active {
+    transform: scale(0.95);
+}
+
+.unlock-btn i {
+    width: 20px;
+    height: 20px;
+}
+
+.pin-error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin: 0;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}
+
+/* Admin Panel - Unlocked */
+.admin-panel {
+    padding: 20px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.admin-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #059669;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 20px;
+}
+
+.status-badge i {
+    width: 16px;
+    height: 16px;
+}
+
+.lock-again-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 10px;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lock-again-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.lock-again-btn i {
+    width: 14px;
+    height: 14px;
+}
+
+.admin-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    background: #f9fafb;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.feature-item:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+}
+
+.feature-item i {
+    width: 18px;
+    height: 18px;
+    color: #7c3aed;
+}
+
+/* Responsive Admin Panel */
+@media (max-width: 480px) {
+    .admin-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .pin-input-container {
+        max-width: 100%;
+    }
+}

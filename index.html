@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Personal Study Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin-styles.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <!-- Main App Container -->
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <h1>StudyHub</h1>
+      </div>
+      <button class="header-btn" id="searchBtn" title="Search">
+        <i data-lucide="search"></i>
+      </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Home Tab -->
+      <section class="tab-content" id="homeTab">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <div class="welcome-content">
+            <h2>Welcome back! 👋</h2>
+            <p>Ready to continue your learning journey?</p>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="quick-stat-item gradient-1">
+            <div class="stat-icon-wrap">
+              <i data-lucide="file-text"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="totalNotes">0</span>
+              <span class="stat-label">Notes</span>
+            </div>
+          </div>
+          <div class="quick-stat-item gradient-2">
+            <div class="stat-icon-wrap">
+              <i data-lucide="video"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="totalVideos">0</span>
+              <span class="stat-label">Videos</span>
+            </div>
+          </div>
+          <div class="quick-stat-item gradient-3">
+            <div class="stat-icon-wrap">
+              <i data-lucide="clock"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="studyHours">0h</span>
+              <span class="stat-label">Studied</span>
+            </div>
+          </div>
+          <div class="quick-stat-item gradient-4">
+            <div class="stat-icon-wrap">
+              <i data-lucide="check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="completionRate">0%</span>
+              <span class="stat-label">Done</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="progress-section">
+          <h3>Today's Progress</h3>
+          <div class="progress-card glass-card">
+            <div class="progress-ring">
+              <svg viewBox="0 0 100 100">
+                <circle class="progress-bg" cx="50" cy="50" r="40"></circle>
+                <circle class="progress-fill" cx="50" cy="50" r="40" id="progressCircle"></circle>
+              </svg>
+              <div class="progress-text">
+                <span id="progressPercent">0%</span>
+              </div>
+            </div>
+            <div class="progress-details">
+              <div class="progress-item">
+                <i data-lucide="clipboard-check"></i>
+                <span><span id="completedTodos">0</span> tasks completed</span>
+              </div>
+              <div class="progress-item">
+                <i data-lucide="calendar-check"></i>
+                <span><span id="completedPlans">0</span> plans done</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Notes -->
+        <div class="content-section">
+          <div class="section-header">
+            <h3><i data-lucide="file-text"></i> Recent Notes</h3>
+            <button class="view-all-btn" onclick="switchTab('notes')">
+              View All <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+          <div class="recent-cards-grid" id="recentNotesList">
+            <div class="empty-state-small">
+              <i data-lucide="file-plus"></i>
+              <p>No notes yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Videos -->
+        <div class="content-section">
+          <div class="section-header">
+            <h3><i data-lucide="video"></i> Recent Videos</h3>
+            <button class="view-all-btn" onclick="switchTab('videos')">
+              View All <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+          <div class="recent-cards-grid" id="recentVideosList">
+            <div class="empty-state-small">
+              <i data-lucide="video"></i>
+              <p>No videos yet</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Section -->
+        <div class="content-section">
+          <div class="section-header">
+            <h3><i data-lucide="calendar"></i> Upcoming</h3>
+            <button class="view-all-btn" onclick="switchTab('planning')">
+              View All <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+          <div class="upcoming-list" id="upcomingList">
+            <div class="empty-state-small">
+              <i data-lucide="calendar-plus"></i>
+              <p>No upcoming plans</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Planning Tab -->
+      <section class="tab-content hidden" id="planningTab">
+        <div class="tab-page-header">
+          <h2><i data-lucide="calendar"></i> Planning</h2>
+        </div>
+
+        <!-- Sub-tabs -->
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-subtab="calendar">
+            <i data-lucide="calendar-days"></i> Calendar
+          </button>
+          <button class="sub-tab" data-subtab="reminders">
+            <i data-lucide="bell"></i> Reminders
+          </button>
+          <button class="sub-tab" data-subtab="todos">
+            <i data-lucide="list-todo"></i> To-Dos
+          </button>
+        </div>
+
+        <!-- Calendar View -->
+        <div class="sub-tab-content" id="calendarView">
+          <div class="calendar-header">
+            <button class="calendar-nav" id="prevMonth">
+              <i data-lucide="chevron-left"></i>
+            </button>
+            <h3 id="currentMonth">March 2026</h3>
+            <button class="calendar-nav" id="nextMonth">
+              <i data-lucide="chevron-right"></i>
+            </button>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <button class="add-btn primary-btn" id="addPlanBtn">
+            <i data-lucide="plus"></i> Add Plan
+          </button>
+        </div>
+
+        <!-- Reminders View -->
+        <div class="sub-tab-content hidden" id="remindersView">
+          <div class="list-container" id="remindersList">
+            <div class="empty-state">
+              <i data-lucide="bell-off"></i>
+              <p>No reminders</p>
+            </div>
+          </div>
+          <button class="add-btn primary-btn" id="addReminderBtn">
+            <i data-lucide="plus"></i> Add Reminder
+          </button>
+        </div>
+
+        <!-- Todos View -->
+        <div class="sub-tab-content hidden" id="todosView">
+          <div class="list-container" id="todosList">
+            <div class="empty-state">
+              <i data-lucide="list-checks"></i>
+              <p>No to-dos</p>
+            </div>
+          </div>
+          <button class="add-btn primary-btn" id="addTodoBtn">
+            <i data-lucide="plus"></i> Add To-Do
+          </button>
+        </div>
+      </section>
+
+      <!-- Class Notes Tab -->
+      <section class="tab-content hidden" id="notesTab">
+        <!-- Modern Hero Section with Stats -->
+        <div class="section-hero gradient-1">
+          <div class="hero-background">
+            <div class="hero-pattern"></div>
+            <div class="floating-shapes">
+              <div class="shape shape-1"></div>
+              <div class="shape shape-2"></div>
+              <div class="shape shape-3"></div>
+              <div class="shape shape-4"></div>
+            </div>
+          </div>
+          <div class="hero-main">
+            <div class="hero-info">
+              <div class="hero-icon">
+                <i data-lucide="file-text"></i>
+              </div>
+              <div class="hero-text">
+                <h1>My Notes</h1>
+                <p>Your study materials</p>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-box">
+                <span class="stat-number" id="notesCount">0</span>
+                <span class="stat-label">Total Notes</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-number" id="notesSubjectsCount">0</span>
+                <span class="stat-label">Subjects</span>
+              </div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn primary" onclick="openNoteModal()">
+                <i data-lucide="plus"></i> Add Note
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+          <div class="search-box">
+            <input type="text" id="notesSearch" placeholder="Search notes...">
+            <i data-lucide="search" class="search-icon"></i>
+          </div>
+          <div class="filter-controls">
+            <select id="notesSubjectFilter" class="filter-select">
+              <option value="">All Subjects</option>
+            </select>
+            <select id="notesSort" class="filter-select">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="title-asc">A-Z</option>
+              <option value="title-desc">Z-A</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="notes-grid" id="notesGrid"></div>
+      </section>
+
+      <!-- Video Classes Tab -->
+      <section class="tab-content hidden" id="videosTab">
+        <!-- Modern Hero Section with Stats -->
+        <div class="section-hero gradient-2">
+          <div class="hero-background">
+            <div class="hero-pattern"></div>
+            <div class="floating-shapes">
+              <div class="shape shape-1"></div>
+              <div class="shape shape-2"></div>
+              <div class="shape shape-3"></div>
+              <div class="shape shape-4"></div>
+            </div>
+          </div>
+          <div class="hero-main">
+            <div class="hero-info">
+              <div class="hero-icon">
+                <i data-lucide="video"></i>
+              </div>
+              <div class="hero-text">
+                <h1>Video Classes</h1>
+                <p>Your video lectures</p>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-box">
+                <span class="stat-number" id="videosCount">0</span>
+                <span class="stat-label">Total Videos</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-number" id="videosDuration">0</span>
+                <span class="stat-label">Minutes</span>
+              </div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn primary" onclick="openVideoModal()">
+                <i data-lucide="plus"></i> Add Video
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+          <div class="search-box">
+            <input type="text" id="videosSearch" placeholder="Search videos...">
+            <i data-lucide="search" class="search-icon"></i>
+          </div>
+          <div class="filter-controls">
+            <select id="videosSubjectFilter" class="filter-select">
+              <option value="">All Subjects</option>
+            </select>
+            <select id="videosSort" class="filter-select">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="title-asc">A-Z</option>
+              <option value="title-desc">Z-A</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="videos-grid" id="videosGrid"></div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section class="tab-content hidden" id="settingsTab">
+        <div class="tab-page-header">
+          <h2><i data-lucide="settings"></i> Settings</h2>
+        </div>
+
+        <!-- Subjects Management -->
+        <div class="settings-section glass-card">
+          <div class="settings-header">
+            <i data-lucide="bookmark"></i>
+            <h3>Subjects</h3>
+          </div>
+          <div class="subjects-list" id="subjectsList">
+            <div class="empty-state-small">
+              <p>No subjects</p>
+            </div>
+          </div>
+          <div class="add-subject-form">
+            <input type="text" id="newSubjectName" placeholder="Subject name..." class="input-field">
+            <input type="color" id="newSubjectColor" value="#6366f1" class="color-picker">
+            <button class="icon-btn primary" id="addSubjectBtn">
+              <i data-lucide="plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Mode -->
+        <div class="settings-section glass-card admin-section">
+          <div class="admin-header">
+            <div class="admin-icon">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <div class="admin-info">
+              <h3>Admin Panel</h3>
+              <p>Secure access to manage content</p>
+            </div>
+          </div>
+          <div id="adminLockScreen" class="admin-lock-screen">
+            <div class="lock-icon">
+              <i data-lucide="lock"></i>
+            </div>
+            <p class="lock-text">Enter PIN to unlock admin features</p>
+            <div class="pin-input-container">
+              <input type="password" id="adminPinInput" class="pin-input" maxlength="6" placeholder="Enter PIN">
+              <button id="unlockAdminBtn" class="unlock-btn" onclick="verifyAdminPin()">
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+            <p id="pinError" class="pin-error" style="display: none;">Incorrect PIN. Please try again.</p>
+          </div>
+          <div id="adminPanel" class="admin-panel" style="display: none;">
+            <div class="admin-status">
+              <span class="status-badge active">
+                <i data-lucide="check-circle"></i> Admin Mode Active
+              </span>
+              <button id="lockAdminBtn" class="lock-again-btn">
+                <i data-lucide="lock"></i> Lock
+              </button>
+            </div>
+            <div class="admin-features">
+              <div class="feature-item">
+                <i data-lucide="plus-circle"></i>
+                <span>Add Notes & Videos</span>
+              </div>
+              <div class="feature-item">
+                <i data-lucide="edit-3"></i>
+                <span>Edit Content</span>
+              </div>
+              <div class="feature-item">
+                <i data-lucide="trash-2"></i>
+                <span>Delete Items</span>
+              </div>
+              <div class="feature-item">
+                <i data-lucide="database"></i>
+                <span>Data Management</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="settings-section glass-card">
+          <div class="settings-header">
+            <i data-lucide="database"></i>
+            <h3>Data</h3>
+          </div>
+          <div class="data-actions">
+            <button class="btn secondary" id="exportDataBtn">
+              <i data-lucide="download"></i> Export
+            </button>
+            <button class="btn secondary" id="importDataBtn">
+              <i data-lucide="upload"></i> Import
+            </button>
+            <button class="btn danger" id="clearDataBtn">
+              <i data-lucide="trash-2"></i> Clear
+            </button>
+          </div>
+          <input type="file" id="importFileInput" accept=".json" style="display: none;">
+        </div>
+
+        <!-- About -->
+        <div class="settings-section glass-card">
+          <div class="settings-header">
+            <i data-lucide="info"></i>
+            <h3>About</h3>
+          </div>
+          <p class="app-version">Personal Study Hub v1.0.0</p>
+          <button class="btn secondary" id="enableNotificationsBtn">
+            <i data-lucide="bell"></i> Enable Notifications
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="home">
+        <i data-lucide="home"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-tab="planning">
+        <i data-lucide="calendar"></i>
+        <span>Planning</span>
+      </button>
+      <button class="nav-item" data-tab="notes">
+        <i data-lucide="file-text"></i>
+        <span>Notes</span>
+      </button>
+      <button class="nav-item" data-tab="videos">
+        <i data-lucide="video"></i>
+        <span>Videos</span>
+      </button>
+      <button class="nav-item" data-tab="settings">
+        <i data-lucide="settings"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Modals -->
+  <!-- Note Modal -->
+  <div class="modal hidden" id="noteModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 id="noteModalTitle">Add Note</h3>
+        <button class="close-btn" onclick="closeModal('noteModal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="noteForm">
+        <input type="hidden" id="noteId">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="noteTitle" required class="input-field">
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="noteSubject" class="input-field"></select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="noteDescription" class="input-field" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>File URL</label>
+          <input type="text" id="noteFileUrl" class="input-field" placeholder="https://...">
+        </div>
+        <button type="submit" class="btn primary submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Video Modal -->
+  <div class="modal hidden" id="videoModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 id="videoModalTitle">Add Video</h3>
+        <button class="close-btn" onclick="closeModal('videoModal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="videoForm">
+        <input type="hidden" id="videoId">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="videoTitle" required class="input-field">
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="videoSubject" class="input-field"></select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="videoDescription" class="input-field" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Duration (minutes)</label>
+          <input type="number" id="videoDuration" class="input-field" min="0">
+        </div>
+        <div class="form-group">
+          <label>Video URL</label>
+          <input type="text" id="videoUrl" class="input-field" placeholder="https://...">
+        </div>
+        <button type="submit" class="btn primary submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Plan Modal -->
+  <div class="modal hidden" id="planModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 id="planModalTitle">Add Plan</h3>
+        <button class="close-btn" onclick="closeModal('planModal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="planForm">
+        <input type="hidden" id="planId">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="planTitle" required class="input-field">
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="planSubject" class="input-field"></select>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="planType" class="input-field">
+            <option value="video">Video</option>
+            <option value="note">Note</option>
+            <option value="study">Study Session</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="planDate" required class="input-field">
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <input type="time" id="planTime" class="input-field">
+        </div>
+        <button type="submit" class="btn primary submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reminder Modal -->
+  <div class="modal hidden" id="reminderModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 id="reminderModalTitle">Add Reminder</h3>
+        <button class="close-btn" onclick="closeModal('reminderModal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="reminderForm">
+        <input type="hidden" id="reminderId">
+        <div class="form-group">
+          <label>Message</label>
+          <input type="text" id="reminderMessage" required class="input-field">
+        </div>
+        <div class="form-group">
+          <label>Date & Time</label>
+          <input type="datetime-local" id="reminderDateTime" required class="input-field">
+        </div>
+        <button type="submit" class="btn primary submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Todo Modal -->
+  <div class="modal hidden" id="todoModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 id="todoModalTitle">Add To-Do</h3>
+        <button class="close-btn" onclick="closeModal('todoModal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="todoForm">
+        <input type="hidden" id="todoId">
+        <div class="form-group">
+          <label>Task</label>
+          <input type="text" id="todoTask" required class="input-field">
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="todoPriority" class="input-field">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <button type="submit" class="btn primary submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PDF Viewer Modal -->
+  <div class="modal hidden" id="pdfViewerModal" style="background: #ffffff;">
+    <div class="viewer-modal-backdrop" style="background: #ffffff;">
+      <div class="viewer-modal-container">
+        <div class="viewer-header">
+          <div class="viewer-title-row">
+            <div>
+              <h2 id="pdfViewerTitle">PDF Viewer</h2>
+            </div>
+          </div>
+          <div class="viewer-actions">
+            <button class="viewer-btn" onclick="window.open(document.getElementById('pdfFrame').src, '_blank')"
+              title="Open in new tab">
+              <i data-lucide="external-link"></i>
+            </button>
+            <button class="viewer-btn close" onclick="closeModal('pdfViewerModal')">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+        <div class="viewer-content pdf-viewer-content">
+          <iframe id="pdfFrame" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Player Modal -->
+  <div class="modal hidden" id="videoPlayerModal" style="background: #ffffff;">
+    <div class="viewer-modal-backdrop" style="background: #ffffff;">
+      <div class="viewer-modal-container">
+        <div class="viewer-header video-header">
+          <div class="viewer-title-row">
+            <div>
+              <h2 id="videoPlayerTitle">Video Player</h2>
+            </div>
+          </div>
+          <div class="viewer-actions">
+            <button class="viewer-btn"
+              onclick="const iframe = document.querySelector('#videoPlayerContainer iframe'); if(iframe) window.open(iframe.src, '_blank'); else if(document.getElementById('videoPlayer').src) window.open(document.getElementById('videoPlayer').src, '_blank');"
+              title="Open in new tab">
+              <i data-lucide="external-link"></i>
+            </button>
+            <button class="viewer-btn close" onclick="closeModal('videoPlayerModal')">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+        <div class="viewer-content video-viewer-content" style="background: #000000;">
+          <div class="custom-video-player" id="customVideoPlayer">
+            <div class="video-loading"></div>
+            <div class="video-container" id="videoPlayerContainer"></div>
+            <div class="custom-controls controls-visible" id="customControls">
+              <div class="progress-bar-container">
+                <div class="progress-bar" id="videoProgressBar">
+                  <div class="progress-filled" id="videoProgress"></div>
+                  <div class="progress-handle" id="progressHandle"></div>
+                </div>
+                <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+              </div>
+              <div class="controls-row">
+                <div class="controls-left">
+                  <button class="control-btn" id="playPauseBtn" title="Play">
+                    <i data-lucide="play" class="play-icon"></i>
+                    <i data-lucide="pause" class="pause-icon" style="display: none;"></i>
+                  </button>
+                  <button class="control-btn" id="rewindBtn" title="Rewind 5s">
+                    <i data-lucide="skip-back"></i>
+                  </button>
+                  <button class="control-btn" id="forwardBtn" title="Forward 5s">
+                    <i data-lucide="skip-forward"></i>
+                  </button>
+                  <div class="volume-control">
+                    <button class="control-btn" id="volumeBtn" title="Volume">
+                      <i data-lucide="volume-2"></i>
+                    </button>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                  </div>
+                </div>
+                <div class="controls-right">
+                  <button class="control-btn" id="speedBtn" title="Playback Speed">
+                    <span>1x</span>
+                  </button>
+                  <button class="control-btn" id="fullscreenBtn" title="Fullscreen">
+                    <i data-lucide="maximize"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <video id="videoPlayer" style="display: none;" playsinline>
+              Your browser does not support video.
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div class="modal hidden" id="confirmModal">
+    <div class="modal-content glass-card confirm-modal">
+      <div class="confirm-icon">
+        <i data-lucide="alert-triangle"></i>
+      </div>
+      <h3 class="confirm-title">Delete Item?</h3>
+      <p id="confirmMessage">Are you sure you want to delete this item? This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn secondary" onclick="closeModal('confirmModal')">
+          <i data-lucide="x"></i> Cancel
+        </button>
+        <button class="btn danger" id="confirmBtn">
+          <i data-lucide="trash-2"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div class="modal hidden" id="searchModal">
+    <div class="modal-content glass-card search-modal">
+      <div class="modal-header">
+        <h3>Search</h3>
+        <button class="close-btn" onclick="closeModal('searchModal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="search-box">
+        <i data-lucide="search"></i>
+        <input type="text" id="globalSearch" placeholder="Search notes, videos, plans...">
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>
