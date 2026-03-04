@@ -1517,13 +1517,25 @@ body::before {
 .modal-content {
     width: 100%;
     max-width: 100%;
-    max-height: 90vh;
     max-height: 90dvh;
     overflow-y: auto;
     animation: modalSlideUp 0.3s ease;
     background: white;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    margin-top: 10vh;
+    margin-top: 10dvh;
+}
+
+/* Mobile adjustments for modal content */
+@media (max-width: 768px) {
+    .modal-content {
+        max-height: 85dvh;
+        margin-top: 5dvh;
+    }
+    
+    .viewer-modal-container {
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+    }
 }
 
 @keyframes modalSlideUp {
@@ -3942,8 +3954,8 @@ body::before {
 .viewer-modal-container {
     width: 100%;
     max-width: 1400px;
-    height: 90vh;
-    max-height: 90vh;
+    height: 90dvh;
+    max-height: 90dvh;
     background: #000000 !important;
     border-radius: 24px;
     overflow: hidden;
@@ -4087,8 +4099,8 @@ body::before {
     }
     
     .viewer-modal-container {
-        height: 100vh;
-        max-height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
         border-radius: 0;
     }
     
@@ -4433,8 +4445,8 @@ h6.bengali-text {
     }
     
     .viewer-modal-container {
-        height: 100vh !important;
-        max-height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
         width: 100vw !important;
         max-width: 100vw !important;
         border-radius: 0 !important;
@@ -4568,9 +4580,9 @@ h6.bengali-text {
     right: 0;
     z-index: 10;
     padding: 12px 20px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent) !important;
-    opacity: 0;
-    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent) !important;
+    opacity: 1;
+    pointer-events: auto;
     transition: opacity 0.3s ease;
 }
 
@@ -4588,16 +4600,18 @@ h6.bengali-text {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
+    z-index: 20;
 }
 
 :fullscreen .viewer-header .viewer-title-row,
 :-webkit-full-screen .viewer-header .viewer-title-row {
-    opacity: 0;
-    pointer-events: none;
+    opacity: 1;
+    pointer-events: auto;
 }
 
-:fullscreen .viewer-header:hover .viewer-title-row,
-:-webkit-full-screen .viewer-header:hover .viewer-title-row {
+/* Always show close button in fullscreen */
+:fullscreen .viewer-btn.close,
+:-webkit-full-screen .viewer-btn.close {
     opacity: 1;
     pointer-events: auto;
 }
@@ -4653,8 +4667,9 @@ h6.bengali-text {
     right: 0;
     width: 100% !important;
     padding: 30px 20px 20px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.95)) !important;
-    opacity: 1;
+    background: transparent !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
     transition: opacity 0.3s ease;
     z-index: 20;
 }
@@ -4720,9 +4735,20 @@ h6.bengali-text {
     bottom: 70px;
     font-size: 14px;
     font-weight: 600;
+    color: #ffffff !important;
     background: rgba(0, 0, 0, 0.5);
     padding: 4px 10px;
     border-radius: 4px;
+    z-index: 15;
+}
+
+:fullscreen .progress-bar-container,
+:-webkit-full-screen .progress-bar-container {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: 30px;
+    z-index: 15;
 }
 
 :fullscreen .control-btn,

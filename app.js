@@ -1775,17 +1775,15 @@ function initYouTubeControls() {
         }
         
         if (controls) {
-            controls.classList.add('auto-hide');
+            // Keep controls visible in fullscreen
+            controls.style.opacity = '1';
+            controls.style.pointerEvents = 'auto';
         }
         
         setTimeout(() => {
             if (header) {
                 header.style.opacity = '0';
                 header.style.pointerEvents = 'none';
-            }
-            if (controls) {
-                controls.style.opacity = '0';
-                controls.style.pointerEvents = 'none';
             }
         }, 2000);
         
@@ -1983,17 +1981,15 @@ function initNativeVideoControls() {
         }
         
         if (controls) {
-            controls.classList.add('auto-hide');
+            // Keep controls visible in fullscreen
+            controls.style.opacity = '1';
+            controls.style.pointerEvents = 'auto';
         }
         
         setTimeout(() => {
             if (header) {
                 header.style.opacity = '0';
                 header.style.pointerEvents = 'none';
-            }
-            if (controls) {
-                controls.style.opacity = '0';
-                controls.style.pointerEvents = 'none';
             }
         }, 2000);
         
