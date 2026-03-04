@@ -74,6 +74,32 @@ let appState = {
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
+    
+    // Handle fullscreen changes to restore header visibility
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            const header = document.querySelector('.viewer-header');
+            if (header) {
+                header.style.opacity = '';
+                header.style.pointerEvents = '';
+                header.classList.remove('auto-hide');
+            }
+            // Unlock orientation when exiting fullscreen
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
+        }
+    });
+    
+    // Also handle webkit fullscreen change
+    document.addEventListener('webkitfullscreenchange', () => {
+        const header = document.querySelector('.viewer-header');
+        if (header && !document.webkitFullscreenElement) {
+            header.style.opacity = '';
+            header.style.pointerEvents = '';
+            header.classList.remove('auto-hide');
+        }
+    });
 });
 
 function initializeApp() {
@@ -1542,7 +1568,7 @@ function openVideoPlayer(id) {
             } else if (!embedUrl.includes('/preview')) {
                 embedUrl = embedUrl + '/preview';
             }
-            playerContainer.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+            playerContainer.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen playsinline></iframe>`;
             openModal('videoPlayerModal');
             return;
         }
@@ -1694,13 +1720,41 @@ function initYouTubeControls() {
     };
     
     // Fullscreen
-    fullscreenBtn.onclick = () => {
+    fullscreenBtn.onclick = async () => {
         console.log('Fullscreen clicked');
         const modal = document.getElementById('videoPlayerModal');
+        
+        // Try to lock to landscape orientation on mobile
+        if (screen.orientation && screen.orientation.lock) {
+            try {
+                await screen.orientation.lock('landscape');
+            } catch (e) {
+                console.log('Orientation lock failed:', e);
+            }
+        } else if (window.screen && window.screen.orientation) {
+            // Fallback for some browsers
+            try {
+                await window.screen.orientation.lock('landscape');
+            } catch (e) {
+                console.log('Orientation lock failed:', e);
+            }
+        }
+        
+        // Request fullscreen
         if (modal.requestFullscreen) {
             modal.requestFullscreen();
         } else if (modal.webkitRequestFullscreen) {
             modal.webkitRequestFullscreen();
+        }
+        
+        // Auto-hide header after 2 seconds in fullscreen
+        const header = document.querySelector('.viewer-header');
+        if (header) {
+            header.classList.add('auto-hide');
+            setTimeout(() => {
+                header.style.opacity = '0';
+                header.style.pointerEvents = 'none';
+            }, 2000);
         }
     };
     
@@ -1830,10 +1884,37 @@ function initNativeVideoControls() {
     };
     
     // Fullscreen
-    fullscreenBtn.onclick = () => {
+    fullscreenBtn.onclick = async () => {
         const modal = document.getElementById('videoPlayerModal');
+        
+        // Try to lock to landscape orientation on mobile
+        if (screen.orientation && screen.orientation.lock) {
+            try {
+                await screen.orientation.lock('landscape');
+            } catch (e) {
+                console.log('Orientation lock failed:', e);
+            }
+        } else if (window.screen && window.screen.orientation) {
+            try {
+                await window.screen.orientation.lock('landscape');
+            } catch (e) {
+                console.log('Orientation lock failed:', e);
+            }
+        }
+        
+        // Request fullscreen
         if (modal.requestFullscreen) {
             modal.requestFullscreen();
+        }
+        
+        // Auto-hide header after 2 seconds in fullscreen
+        const header = document.querySelector('.viewer-header');
+        if (header) {
+            header.classList.add('auto-hide');
+            setTimeout(() => {
+                header.style.opacity = '0';
+                header.style.pointerEvents = 'none';
+            }, 2000);
         }
     };
     

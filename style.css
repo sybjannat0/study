@@ -3944,7 +3944,7 @@ body::before {
     max-width: 1400px;
     height: 90vh;
     max-height: 90vh;
-    background: #ffffff !important;
+    background: #000000 !important;
     border-radius: 24px;
     overflow: hidden;
     display: flex;
@@ -4402,6 +4402,179 @@ h6.bengali-text {
     
     .volume-control:hover .volume-slider {
         width: 60px;
+    }
+}
+
+/* Mobile Landscape - Full screen video player */
+@media (max-width: 768px) and (orientation: landscape) {
+    #videoPlayerModal {
+        padding: 0 !important;
+    }
+    
+    .viewer-modal-backdrop {
+        padding: 0 !important;
+    }
+    
+    .viewer-modal-container {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .viewer-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        padding: 8px 16px;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent) !important;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    }
+    
+    .viewer-header.auto-hide {
+        opacity: 1;
+    }
+    
+    .viewer-header:hover,
+    #videoPlayerModal:hover .viewer-header {
+        opacity: 1;
+    }
+    
+    .viewer-header h2 {
+        font-size: 1rem;
+    }
+    
+    .video-viewer-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+    }
+    
+    .custom-video-player {
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+    
+    .custom-video-player .video-container {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    .custom-video-player iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+    
+    .custom-video-player video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw !important;
+        height: 100vh !important;
+        object-fit: contain !important;
+    }
+    
+    .custom-controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100% !important;
+        padding: 20px 16px 16px;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.9)) !important;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    #videoPlayerModal:hover .custom-controls,
+    .custom-controls:hover {
+        opacity: 1;
+    }
+    
+    .controls-row {
+        gap: 12px;
+    }
+    
+    .control-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .progress-bar-container {
+        margin-bottom: 8px;
+    }
+}
+
+/* Mobile Portrait - Full screen video player */
+@media (max-width: 480px) and (orientation: portrait) {
+    #videoPlayerModal {
+        padding: 0 !important;
+    }
+    
+    .viewer-modal-backdrop {
+        padding: 0 !important;
+    }
+    
+    .viewer-modal-container {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .viewer-header {
+        padding: 12px 16px;
+    }
+    
+    .viewer-header h2 {
+        font-size: 1rem;
+    }
+    
+    .video-viewer-content {
+        width: 100vw !important;
+        height: calc(100vh - 60px) !important;
+    }
+    
+    .custom-video-player {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    .custom-video-player iframe {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    .custom-video-player video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+    }
+    
+    .custom-controls {
+        padding: 24px 12px 12px;
+    }
+    
+    .control-btn {
+        width: 40px;
+        height: 40px;
     }
 }
 
