@@ -70,10 +70,143 @@ let appState = {
 };
 
 // ============================================
+// Pre-define switchTab globally to avoid issues
+// ============================================
+window.switchTab = function(tabName) {
+    showTab(tabName);
+};
+
+// ============================================
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
+    // Check if user is already logged in
+    const isLoggedIn = sessionStorage.getItem('appLoggedIn') === 'true';
+    
+    // Get DOM elements for login screen
+    const loginScreen = document.getElementById('appLoginScreen');
+    const appContainer = document.querySelector('.app-container');
+    const loginIdInput = document.getElementById('appLoginId');
+    const loginPasswordInput = document.getElementById('appLoginPassword');
+    const loginBtn = document.getElementById('appLoginBtn');
+    const loginError = document.getElementById('appLoginError');
+    
+    // Function to verify user login
+    window.verifyUserLogin = async function(username, password) {
+        if (!supabaseClient) {
+            console.log('Supabase not connected, using fallback');
+            // Fallback to default credentials if Supabase not connected
+            if (username === '220101' && password === '179084') {
+                return { success: true };
+            }
+            return { success: false, error: 'Supabase not connected' };
+        }
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('login_credentials')
+                .select('*')
+                .eq('username', username)
+                .eq('password', password)
+                .single();
+            
+            if (error) {
+                console.log('Login error:', error);
+                return { success: false, error: 'Invalid credentials' };
+            }
+            
+            if (data) {
+                return { success: true, data: data };
+            }
+            
+            return { success: false, error: 'Invalid credentials' };
+        } catch (e) {
+            console.log('Login exception:', e);
+            return { success: false, error: 'Login failed' };
+        }
+    };
+    
+    // Function to show main app
+    window.showMainApp = function() {
+        console.log('showMainApp called');
+        if (loginScreen) {
+            loginScreen.style.display = 'none';
+            console.log('Hidden login screen');
+        }
+        if (appContainer) {
+            appContainer.style.display = '';
+            console.log('Shown app container');
+        }
+        // Small delay to ensure DOM is visible before initializing
+        setTimeout(() => {
+            console.log('Calling initializeApp...');
+            initializeApp();
+        }, 50);
+    };
+    
+    // Handle login button click
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async () => {
+            const username = loginIdInput ? loginIdInput.value.trim() : '';
+            const password = loginPasswordInput ? loginPasswordInput.value.trim() : '';
+            
+            if (!username || !password) {
+                if (loginError) {
+                    loginError.textContent = 'Please enter ID and Password';
+                    loginError.style.display = 'block';
+                }
+                return;
+            }
+            
+            // Disable button during login
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            
+            const result = await window.verifyUserLogin(username, password);
+            
+            if (result.success) {
+                sessionStorage.setItem('appLoggedIn', 'true');
+                window.showMainApp();
+            } else {
+                if (loginError) {
+                    loginError.textContent = result.error || 'Invalid ID or Password';
+                    loginError.style.display = 'block';
+                }
+                if (loginPasswordInput) loginPasswordInput.value = '';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        });
+    }
+    
+    // Handle Enter key in login inputs
+    if (loginIdInput) {
+        loginIdInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginPasswordInput.focus();
+            }
+        });
+    }
+    
+    if (loginPasswordInput) {
+        loginPasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && loginBtn) {
+                loginBtn.click();
+            }
+        });
+    }
+    
+    // If already logged in, show main app
+    if (isLoggedIn) {
+        console.log('User already logged in, showing main app');
+        setTimeout(() => {
+            window.showMainApp();
+        }, 50);
+    } else {
+        console.log('User not logged in, showing login screen');
+        // Hide the main app until logged in
+        if (appContainer) appContainer.style.display = 'none';
+    }
     
     // Handle fullscreen changes to restore header visibility
     document.addEventListener('fullscreenchange', () => {
@@ -117,6 +250,41 @@ document.addEventListener('DOMContentLoaded', () => {
             controls.classList.remove('auto-hide');
         }
     });
+    
+    // Verify login credentials from Supabase
+    window.verifyLoginCredentials = async function(username, password) {
+        if (!supabaseClient) {
+            console.log('Supabase not connected, using fallback');
+            // Fallback to default credentials if Supabase not connected
+            if (username === '220101' && password === '179084') {
+                return { success: true };
+            }
+            return { success: false, error: 'Supabase not connected' };
+        }
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('login_credentials')
+                .select('*')
+                .eq('username', username)
+                .eq('password', password)
+                .single();
+            
+            if (error) {
+                console.log('Login error:', error);
+                return { success: false, error: 'Invalid credentials' };
+            }
+            
+            if (data) {
+                return { success: true };
+            }
+            
+            return { success: false, error: 'Invalid credentials' };
+        } catch (e) {
+            console.log('Login exception:', e);
+            return { success: false, error: 'Login failed' };
+        }
+    };
 });
 
 function initializeApp() {
@@ -202,14 +370,20 @@ function initializeViews() {
 
 // Load data from localStorage or Supabase
 async function loadData() {
+    console.log('Loading data...');
+    console.log('Supabase client available:', !!supabaseClient);
+    
     // Try to load from Supabase first
     if (supabaseClient) {
         try {
+            console.log('Attempting to load from Supabase...');
             const { data: remoteData, error } = await supabaseClient
                 .from('app_data')
                 .select('*')
                 .eq('id', 'main')
                 .single();
+            
+            console.log('Supabase response:', { data: remoteData, error });
             
             if (!error && remoteData) {
                 appState.subjects = remoteData.subjects || defaultSubjects;
@@ -232,6 +406,8 @@ async function loadData() {
         } catch (e) {
             console.log('Supabase fetch failed, using localStorage:', e);
         }
+    } else {
+        console.log('No Supabase client, using localStorage');
     }
     
     // Fallback to localStorage
@@ -438,32 +614,109 @@ function setupEventListeners() {
     const lockAdminBtn = document.getElementById('lockAdminBtn');
     const pinError = document.getElementById('pinError');
 
-    // Make verifyAdminPin available globally
-    window.verifyAdminPin = function() {
+    // Expose function globally - verifyAdminPin must query admin_pin from Supabase
+    window.verifyAdminPin = async function() {
         console.log('verifyAdminPin called');
         if (!adminPinInput) {
             console.error('adminPinInput element not found');
             return;
         }
         const pin = adminPinInput.value.trim();
-        const expectedPin = '179084';
-        console.log('Entered PIN:', pin, 'Expected:', expectedPin);
-        if (pin === expectedPin) {
-            isAdminUnlocked = true;
-            sessionStorage.setItem('adminUnlocked', 'true');
-            appState.settings.adminMode = true;
-            saveData();
-            showAdminPanel();
-            renderNotes();
-            renderVideos();
-            showToast('Admin mode unlocked successfully!', 'success');
-        } else {
-            console.log('PIN incorrect');
-            if (pinError) pinError.style.display = 'block';
-            if (adminPinInput) adminPinInput.value = '';
-            setTimeout(() => {
-                if (pinError) pinError.style.display = 'none';
-            }, 3000);
+        
+        console.log('Verifying admin PIN:', pin);
+        
+        // Verify PIN against Supabase
+        if (!supabaseClient) {
+            console.log('Supabase not connected, using fallback');
+            // Fallback to default PIN if Supabase not connected
+            if (pin === '1610') {
+                isAdminUnlocked = true;
+                sessionStorage.setItem('adminUnlocked', 'true');
+                appState.settings.adminMode = true;
+                saveData();
+                showAdminPanel();
+                renderNotes();
+                renderVideos();
+                showToast('Admin mode unlocked successfully!', 'success');
+            } else {
+                console.log('PIN incorrect (fallback)');
+                if (pinError) pinError.style.display = 'block';
+                if (adminPinInput) adminPinInput.value = '';
+                setTimeout(() => {
+                    if (pinError) pinError.style.display = 'none';
+                }, 3000);
+            }
+            return;
+        }
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('login_credentials')
+                .select('admin_pin')
+                .eq('id', 'admin')
+                .single();
+            
+            if (error || !data) {
+                console.log('Could not fetch admin PIN:', error);
+                // Fallback
+                if (pin === '1610') {
+                    isAdminUnlocked = true;
+                    sessionStorage.setItem('adminUnlocked', 'true');
+                    appState.settings.adminMode = true;
+                    saveData();
+                    showAdminPanel();
+                    renderNotes();
+                    renderVideos();
+                    showToast('Admin mode unlocked successfully!', 'success');
+                } else {
+                    if (pinError) pinError.style.display = 'block';
+                    if (adminPinInput) adminPinInput.value = '';
+                    setTimeout(() => {
+                        if (pinError) pinError.style.display = 'none';
+                    }, 3000);
+                }
+                return;
+            }
+            
+            const storedPin = data.admin_pin;
+            console.log('Stored PIN from Supabase:', storedPin);
+            
+            if (pin === storedPin) {
+                isAdminUnlocked = true;
+                sessionStorage.setItem('adminUnlocked', 'true');
+                appState.settings.adminMode = true;
+                saveData();
+                showAdminPanel();
+                renderNotes();
+                renderVideos();
+                showToast('Admin mode unlocked successfully!', 'success');
+            } else {
+                console.log('PIN incorrect');
+                if (pinError) pinError.style.display = 'block';
+                if (adminPinInput) adminPinInput.value = '';
+                setTimeout(() => {
+                    if (pinError) pinError.style.display = 'none';
+                }, 3000);
+            }
+        } catch (e) {
+            console.log('PIN verification exception:', e);
+            // Fallback
+            if (pin === '1610') {
+                isAdminUnlocked = true;
+                sessionStorage.setItem('adminUnlocked', 'true');
+                appState.settings.adminMode = true;
+                saveData();
+                showAdminPanel();
+                renderNotes();
+                renderVideos();
+                showToast('Admin mode unlocked successfully!', 'success');
+            } else {
+                if (pinError) pinError.style.display = 'block';
+                if (adminPinInput) adminPinInput.value = '';
+                setTimeout(() => {
+                    if (pinError) pinError.style.display = 'none';
+                }, 3000);
+            }
         }
     };
 
@@ -479,44 +732,17 @@ function setupEventListeners() {
         });
     }
 
-    if (lockAdminBtn) {
-        lockAdminBtn.addEventListener('click', lockAdminPanel);
+    // Also trigger login on Enter in ID input
+    if (adminIdInput) {
+        adminIdInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                window.verifyAdminPin();
+            }
+        });
     }
 
-    function verifyAdminPin() {
-        console.log('verifyAdminPin called');
-        console.log('adminPinInput:', adminPinInput);
-        if (!adminPinInput) {
-            console.error('adminPinInput element not found');
-            return;
-        }
-        const pin = adminPinInput.value.trim();
-        const expectedPin = ADMIN_PIN.trim();
-        console.log('Entered PIN:', pin, '(' + pin.length + ' chars)', 'Expected:', expectedPin, '(' + expectedPin.length + ' chars)');
-        console.log('Match:', pin === expectedPin);
-        if (pin === expectedPin) {
-            isAdminUnlocked = true;
-            sessionStorage.setItem('adminUnlocked', 'true');
-            appState.settings.adminMode = true;
-            saveData();
-            showAdminPanel();
-            renderNotes();
-            renderVideos();
-            showToast('Admin mode unlocked successfully!', 'success');
-        } else {
-            console.log('PIN incorrect');
-            if (pinError) {
-                pinError.style.display = 'block';
-            }
-            if (adminPinInput) {
-                adminPinInput.value = '';
-            }
-            setTimeout(() => {
-                if (pinError) {
-                    pinError.style.display = 'none';
-                }
-            }, 3000);
-        }
+    if (lockAdminBtn) {
+        lockAdminBtn.addEventListener('click', lockAdminPanel);
     }
 
     function lockAdminPanel() {
@@ -555,6 +781,7 @@ function setupEventListeners() {
         }
         if (adminPanel) adminPanel.style.display = 'none';
         if (adminPinInput) adminPinInput.value = '';
+        if (adminIdInput) adminIdInput.value = '';
         // Hide other settings sections when admin is locked
         const settingsSections = document.querySelectorAll('.settings-section');
         settingsSections.forEach(section => {
@@ -579,53 +806,126 @@ function setupEventListeners() {
 // Navigation
 // ============================================
 function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const tab = item.dataset.tab;
-            switchTab(tab);
+    console.log('Setting up navigation...');
+    
+    // Wait for DOM to be fully ready
+    setTimeout(() => {
+        const navContainer = document.querySelector('.bottom-nav');
+        if (!navContainer) {
+            console.error('Navigation container not found!');
+            return;
+        }
+        
+        // Get nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        console.log('Nav items found:', navItems.length);
+        
+        navItems.forEach((item) => {
+            // Get the tab name directly
+            const tabName = item.getAttribute('data-tab');
+            console.log('Setting up nav item for tab:', tabName);
+            
+            // Add click handler directly
+            item.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Nav clicked:', tabName);
+                if (tabName) {
+                    // Manually switch tabs
+                    showTab(tabName);
+                }
+            };
         });
-    });
+        
+        console.log('Navigation setup complete');
+    }, 100);
 }
 
-function switchTab(tabName) {
-    // Update navigation
+// Show tab function
+function showTab(tabName) {
+    console.log('showTab called:', tabName);
+    
+    // Make sure app container is visible
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer && appContainer.style.display === 'none') {
+        appContainer.style.display = '';
+    }
+    
+    // Always show navigation in all tabs (navigation hides only in video player modal)
+    const bottomNav = document.querySelector('.bottom-nav');
+    if (bottomNav) {
+        bottomNav.style.display = '';
+    }
+    
+    // Update nav items
     document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.tab === tabName);
+        const itemTab = item.getAttribute('data-tab');
+        if (itemTab === tabName) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
     });
-
-    // Update tab content
+    
+    // Hide all tab contents
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.add('hidden');
     });
-    document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-
-    appState.currentTab = tabName;
-    renderAll();
+    
+    // Show target tab
+    const targetTab = document.getElementById(tabName + 'Tab');
+    if (targetTab) {
+        targetTab.classList.remove('hidden');
+    }
+    
+    // Render content based on tab
+    if (tabName === 'home') {
+        renderStats();
+        updateHeroStats();
+        renderRecentNotes();
+        renderRecentVideos();
+        renderUpcoming();
+    } else if (tabName === 'notes') {
+        renderNotes();
+        renderSubjects();
+        // Update stats in notes tab hero
+        const notesCount = document.querySelector('#notesTab #notesCount');
+        if (notesCount) {
+            notesCount.textContent = appState.notes.length;
+        }
+        const notesSubjectsCount = document.querySelector('#notesTab #notesSubjectsCount');
+        if (notesSubjectsCount) {
+            const uniqueSubjects = new Set(appState.notes.map(n => n.subjectId).filter(Boolean));
+            notesSubjectsCount.textContent = uniqueSubjects.size;
+        }
+    } else if (tabName === 'videos') {
+        renderVideos();
+        // Update stats in videos tab hero
+        const videosCount = document.querySelector('#videosTab #videosCount');
+        if (videosCount) {
+            videosCount.textContent = appState.videos.length;
+        }
+    } else if (tabName === 'planning') {
+        renderCalendar();
+        renderReminders();
+        renderTodos();
+    } else if (tabName === 'settings') {
+        populateSubjectSelects();
+    }
+    
+    // Update state
+    if (typeof appState !== 'undefined') {
+        appState.currentTab = tabName;
+    }
     
     // Re-initialize Lucide icons
     if (typeof lucide !== 'undefined') {
-        setTimeout(() => lucide.createIcons(), 100);
-    }
-    
-    // Re-initialize admin panel when switching to settings tab (delayed to ensure DOM is ready)
-    if (tabName === 'settings') {
-        console.log('Switched to settings tab, initializing admin');
-        setTimeout(() => {
-            if (typeof showAdminLockScreen === 'function') {
-                if (isAdminUnlocked) {
-                    showAdminPanel();
-                } else {
-                    showAdminLockScreen();
-                }
-            } else {
-                console.error('showAdminLockScreen not defined yet');
-            }
-        }, 200);
+        setTimeout(() => lucide.createIcons(), 50);
     }
 }
 
-window.switchTab = switchTab;
+// Make it globally available
+window.showTab = showTab;
 
 // ============================================
 // Navigation
@@ -1243,6 +1543,10 @@ function openModal(modalId) {
         document.body.style.width = '100%';
         document.addEventListener('keydown', handleViewerKeydown);
         document.documentElement.classList.add('viewer-open');
+        
+        // Hide navigation when video player or PDF viewer is open
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (bottomNav) bottomNav.style.display = 'none';
     }
     
     document.getElementById(modalId).classList.remove('hidden');
@@ -1297,7 +1601,7 @@ function closeModal(modalId) {
         }
         
         // Navigate to videos tab after closing video player
-        switchTab('videos');
+        showTab('videos');
     }
     
     // Re-enable body scroll and remove classes when closing viewer modals
@@ -1306,6 +1610,10 @@ function closeModal(modalId) {
         document.documentElement.classList.remove('viewer-open');
         document.body.style.overflow = '';
         document.body.style.position = '';
+        
+        // Show navigation when closing video player or PDF viewer
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (bottomNav) bottomNav.style.display = '';
     }
     
     const modal = document.getElementById(modalId);
@@ -1507,6 +1815,13 @@ function openVideoPlayer(id) {
     const video = appState.videos.find(v => v.id === id);
     if (!video) return;
     
+    // Ensure controls are visible when player opens
+    const customControls = document.getElementById('customControls');
+    if (customControls) {
+        customControls.classList.remove('auto-hide');
+        customControls.style.opacity = '1';
+    }
+    
     document.getElementById('videoPlayerTitle').textContent = video.title;
     const playerContainer = document.getElementById('videoPlayerContainer');
     const customPlayer = document.getElementById('customVideoPlayer');
@@ -1574,6 +1889,21 @@ function openVideoPlayer(id) {
                 
                 createPlayer();
                 openModal('videoPlayerModal');
+                
+                // Ensure controls are visible
+                const customControls = document.getElementById('customControls');
+                if (customControls) {
+                    customControls.style.opacity = '1';
+                    customControls.classList.remove('auto-hide');
+                }
+                
+                // Re-initialize Lucide icons
+                setTimeout(() => {
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }, 100);
+                
                 return;
             }
         }
@@ -1769,12 +2099,15 @@ function initYouTubeControls() {
         // Auto-hide controls after 3 seconds in fullscreen (header is always hidden in CSS)
         const controls = document.getElementById('customControls');
         
+        // Show controls initially in fullscreen
         if (controls) {
-            controls.classList.add('auto-hide');
+            controls.style.opacity = '1';
+            controls.style.pointerEvents = 'auto';
         }
         
         setTimeout(() => {
-            if (controls && document.fullscreenElement) {
+            if (controls && (document.fullscreenElement || document.webkitFullscreenElement)) {
+                controls.classList.add('auto-hide');
                 controls.style.opacity = '0';
                 controls.style.pointerEvents = 'none';
             }
@@ -1796,7 +2129,7 @@ function initYouTubeControls() {
                 
                 // Hide again after 3 seconds
                 setTimeout(() => {
-                    if (controls && document.fullscreenElement) {
+                    if (controls && (document.fullscreenElement || document.webkitFullscreenElement)) {
                         controls.classList.add('auto-hide');
                         controls.style.opacity = '0';
                         controls.style.pointerEvents = 'none';
@@ -1958,12 +2291,15 @@ function initNativeVideoControls() {
         // Auto-hide controls after 3 seconds in fullscreen (header is always hidden in CSS)
         const controls = document.getElementById('customControls');
         
+        // Show controls initially in fullscreen
         if (controls) {
-            controls.classList.add('auto-hide');
+            controls.style.opacity = '1';
+            controls.style.pointerEvents = 'auto';
         }
         
         setTimeout(() => {
-            if (controls && document.fullscreenElement) {
+            if (controls && (document.fullscreenElement || document.webkitFullscreenElement)) {
+                controls.classList.add('auto-hide');
                 controls.style.opacity = '0';
                 controls.style.pointerEvents = 'none';
             }
@@ -2669,13 +3005,13 @@ function handleGlobalSearch() {
     
     appState.notes.forEach(note => {
         if (note.title.toLowerCase().includes(query)) {
-            results.push({ type: 'note', title: note.title, action: () => { switchTab('notes'); closeModal('searchModal'); } });
+            results.push({ type: 'note', title: note.title, action: () => { showTab('notes'); closeModal('searchModal'); } });
         }
     });
     
     appState.videos.forEach(video => {
         if (video.title.toLowerCase().includes(query)) {
-            results.push({ type: 'video', title: video.title, action: () => { switchTab('videos'); closeModal('searchModal'); } });
+            results.push({ type: 'video', title: video.title, action: () => { showTab('videos'); closeModal('searchModal'); } });
         }
     });
     

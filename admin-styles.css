@@ -98,6 +98,37 @@
     background: #f9fafb;
 }
 
+.id-input-container {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 240px;
+}
+
+.id-input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.id-input:focus {
+    outline: none;
+    border-color: #7c3aed;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+.id-input::placeholder {
+    letter-spacing: 2px;
+    color: #d1d5db;
+}
+
 .pin-input:focus {
     outline: none;
     border-color: #7c3aed;

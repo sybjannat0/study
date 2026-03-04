@@ -117,6 +117,127 @@ body::before {
     50% { transform: scale(1.05) rotate(1deg); }
 }
 
+/* ============================================
+   Pre-App Login Screen
+   ============================================ */
+.app-login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.login-container {
+    background: white;
+    border-radius: 24px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.login-logo {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+}
+
+.login-logo i {
+    width: 36px;
+    height: 36px;
+    color: white;
+}
+
+.login-container h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 8px;
+}
+
+.login-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0 0 32px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.login-input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+    box-sizing: border-box;
+}
+
+.login-input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.login-input-group input::placeholder {
+    color: #9ca3af;
+}
+
+.login-button {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.login-error {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 12px;
+    background: #fef2f2;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+}
+
 /* App Container - Mobile First */
 .app-container {
     width: 100%;
@@ -128,6 +249,7 @@ body::before {
     display: flex;
     flex-direction: column;
     position: relative;
+    pointer-events: auto;
 }
 
 /* ============================================
@@ -1437,8 +1559,10 @@ body::before {
     align-items: flex-end;
     padding: 0 4px;
     padding-bottom: var(--safe-area-inset-bottom);
-    z-index: 1000;
+    z-index: 10000;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .nav-item {
@@ -1456,6 +1580,19 @@ body::before {
     border-radius: var(--radius-md);
     flex: 1;
     max-width: 70px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.nav-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.nav-item.active {
+    color: #667eea;
 }
 
 .nav-item i {
@@ -4682,15 +4819,19 @@ h6.bengali-text {
 
 :fullscreen .controls-row,
 :-webkit-full-screen .controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 40px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: auto;
-    padding: 20px 40px;
-    background: rgba(0, 0, 0, 0.3);
+    padding: 30px 50px;
+    background: rgba(0, 0, 0, 0.5);
     border-radius: 50px;
+    z-index: 100;
 }
 
 :fullscreen .controls-center,
@@ -4698,41 +4839,42 @@ h6.bengali-text {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 30px;
 }
 
 :fullscreen .controls-left,
 :-webkit-full-screen .controls-left {
-    display: flex;
-    gap: 15px;
+    display: none;
 }
 
 :fullscreen .controls-right,
 :-webkit-full-screen .controls-right {
-    display: flex;
-    gap: 15px;
+    display: none;
 }
 
 :fullscreen .progress-bar-container,
 :-webkit-full-screen .progress-bar-container {
     position: absolute;
-    left: 30px;
-    right: 30px;
+    left: 50%;
     bottom: 30px;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 600px;
 }
 
 :fullscreen .time-display,
 :-webkit-full-screen .time-display {
     position: absolute;
-    left: 30px;
-    bottom: 70px;
+    left: 50%;
+    bottom: 80px;
+    transform: translateX(-50%);
     font-size: 14px;
     font-weight: 600;
     color: #ffffff !important;
     background: rgba(0, 0, 0, 0.5);
     padding: 4px 10px;
     border-radius: 4px;
-    z-index: 15;
+    z-index: 100;
 }
 
 :fullscreen .progress-bar-container,

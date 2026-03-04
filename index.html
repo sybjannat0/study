@@ -18,6 +18,27 @@
 </head>
 
 <body>
+  <!-- Pre-App Login Screen -->
+  <div id="appLoginScreen" class="app-login-screen">
+    <div class="login-container">
+      <div class="login-logo">
+        <i data-lucide="graduation-cap"></i>
+      </div>
+      <h1>Personal Study Hub</h1>
+      <p class="login-subtitle">Enter your credentials to access the app</p>
+      <div class="login-form">
+        <div class="login-input-group">
+          <input type="text" id="appLoginId" placeholder="Enter ID" autocomplete="off">
+        </div>
+        <div class="login-input-group">
+          <input type="password" id="appLoginPassword" placeholder="Enter Password">
+        </div>
+        <button id="appLoginBtn" class="login-button">Login</button>
+        <p id="appLoginError" class="login-error" style="display: none;">Invalid ID or Password</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Main App Container -->
   <div class="app-container">
     <!-- Header -->
@@ -465,23 +486,23 @@
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-      <button class="nav-item active" data-tab="home">
+      <button class="nav-item active" data-tab="home" onclick="switchTab('home')">
         <i data-lucide="home"></i>
         <span>Home</span>
       </button>
-      <button class="nav-item" data-tab="planning">
+      <button class="nav-item" data-tab="planning" onclick="switchTab('planning')">
         <i data-lucide="calendar"></i>
         <span>Planning</span>
       </button>
-      <button class="nav-item" data-tab="notes">
+      <button class="nav-item" data-tab="notes" onclick="switchTab('notes')">
         <i data-lucide="file-text"></i>
         <span>Notes</span>
       </button>
-      <button class="nav-item" data-tab="videos">
+      <button class="nav-item" data-tab="videos" onclick="switchTab('videos')">
         <i data-lucide="video"></i>
         <span>Videos</span>
       </button>
-      <button class="nav-item" data-tab="settings">
+      <button class="nav-item" data-tab="settings" onclick="switchTab('settings')">
         <i data-lucide="settings"></i>
         <span>Settings</span>
       </button>
