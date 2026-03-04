@@ -4580,16 +4580,10 @@ h6.bengali-text {
     right: 0;
     z-index: 10;
     padding: 12px 20px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent) !important;
-    opacity: 1;
-    pointer-events: auto;
-    transition: opacity 0.3s ease;
-}
-
-:fullscreen .viewer-header.auto-hide,
-:-webkit-full-screen .viewer-header.auto-hide {
+    background: transparent !important;
     opacity: 0;
     pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 :fullscreen .viewer-header .viewer-actions,
@@ -4605,8 +4599,7 @@ h6.bengali-text {
 
 :fullscreen .viewer-header .viewer-title-row,
 :-webkit-full-screen .viewer-header .viewer-title-row {
-    opacity: 1;
-    pointer-events: auto;
+    display: none;
 }
 
 /* Always show close button in fullscreen */
@@ -4668,8 +4661,8 @@ h6.bengali-text {
     width: 100% !important;
     padding: 30px 20px 20px;
     background: transparent !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
+    opacity: 1;
+    pointer-events: auto;
     transition: opacity 0.3s ease;
     z-index: 20;
 }

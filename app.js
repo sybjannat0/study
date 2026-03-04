@@ -1766,59 +1766,42 @@ function initYouTubeControls() {
             modal.webkitRequestFullscreen();
         }
         
-        // Auto-hide header after 2 seconds in fullscreen
-        const header = document.querySelector('.viewer-header');
+        // Auto-hide controls after 3 seconds in fullscreen (header is always hidden in CSS)
         const controls = document.getElementById('customControls');
         
-        if (header) {
-            header.classList.add('auto-hide');
-        }
-        
         if (controls) {
-            // Keep controls visible in fullscreen
-            controls.style.opacity = '1';
-            controls.style.pointerEvents = 'auto';
+            controls.classList.add('auto-hide');
         }
         
         setTimeout(() => {
-            if (header) {
-                header.style.opacity = '0';
-                header.style.pointerEvents = 'none';
+            if (controls && document.fullscreenElement) {
+                controls.style.opacity = '0';
+                controls.style.pointerEvents = 'none';
             }
-        }, 2000);
+        }, 3000);
         
         // Add click handler to video container to show controls temporarily
         const videoContent = document.querySelector('.video-viewer-content');
         if (videoContent) {
             videoContent.onclick = (e) => {
                 // Don't trigger if clicking on controls
-                if (e.target.closest('.custom-controls') || e.target.closest('.viewer-header')) return;
+                if (e.target.closest('.custom-controls')) return;
                 
                 // Show controls
-                if (header) {
-                    header.classList.remove('auto-hide');
-                    header.style.opacity = '1';
-                    header.style.pointerEvents = 'auto';
-                }
                 if (controls) {
                     controls.classList.remove('auto-hide');
                     controls.style.opacity = '1';
                     controls.style.pointerEvents = 'auto';
                 }
                 
-                // Hide again after 2 seconds
+                // Hide again after 3 seconds
                 setTimeout(() => {
-                    if (header && document.fullscreenElement) {
-                        header.classList.add('auto-hide');
-                        header.style.opacity = '0';
-                        header.style.pointerEvents = 'none';
-                    }
                     if (controls && document.fullscreenElement) {
                         controls.classList.add('auto-hide');
                         controls.style.opacity = '0';
                         controls.style.pointerEvents = 'none';
                     }
-                }, 2000);
+                }, 3000);
             };
         }
     };
@@ -1972,59 +1955,42 @@ function initNativeVideoControls() {
             modal.requestFullscreen();
         }
         
-        // Auto-hide header after 2 seconds in fullscreen
-        const header = document.querySelector('.viewer-header');
+        // Auto-hide controls after 3 seconds in fullscreen (header is always hidden in CSS)
         const controls = document.getElementById('customControls');
         
-        if (header) {
-            header.classList.add('auto-hide');
-        }
-        
         if (controls) {
-            // Keep controls visible in fullscreen
-            controls.style.opacity = '1';
-            controls.style.pointerEvents = 'auto';
+            controls.classList.add('auto-hide');
         }
         
         setTimeout(() => {
-            if (header) {
-                header.style.opacity = '0';
-                header.style.pointerEvents = 'none';
+            if (controls && document.fullscreenElement) {
+                controls.style.opacity = '0';
+                controls.style.pointerEvents = 'none';
             }
-        }, 2000);
+        }, 3000);
         
         // Add click handler to video container to show controls temporarily
         const videoContent = document.querySelector('.video-viewer-content');
         if (videoContent) {
             videoContent.onclick = (e) => {
                 // Don't trigger if clicking on controls
-                if (e.target.closest('.custom-controls') || e.target.closest('.viewer-header')) return;
+                if (e.target.closest('.custom-controls')) return;
                 
                 // Show controls
-                if (header) {
-                    header.classList.remove('auto-hide');
-                    header.style.opacity = '1';
-                    header.style.pointerEvents = 'auto';
-                }
                 if (controls) {
                     controls.classList.remove('auto-hide');
                     controls.style.opacity = '1';
                     controls.style.pointerEvents = 'auto';
                 }
                 
-                // Hide again after 2 seconds
+                // Hide again after 3 seconds
                 setTimeout(() => {
-                    if (header && document.fullscreenElement) {
-                        header.classList.add('auto-hide');
-                        header.style.opacity = '0';
-                        header.style.pointerEvents = 'none';
-                    }
                     if (controls && document.fullscreenElement) {
                         controls.classList.add('auto-hide');
                         controls.style.opacity = '0';
                         controls.style.pointerEvents = 'none';
                     }
-                }, 2000);
+                }, 3000);
             };
         }
     };
