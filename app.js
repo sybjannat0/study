@@ -79,11 +79,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement) {
             const header = document.querySelector('.viewer-header');
+            const controls = document.getElementById('customControls');
+            
             if (header) {
                 header.style.opacity = '';
                 header.style.pointerEvents = '';
                 header.classList.remove('auto-hide');
             }
+            
+            if (controls) {
+                controls.style.opacity = '';
+                controls.style.pointerEvents = '';
+                controls.classList.remove('auto-hide');
+            }
+            
             // Unlock orientation when exiting fullscreen
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
@@ -94,10 +103,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Also handle webkit fullscreen change
     document.addEventListener('webkitfullscreenchange', () => {
         const header = document.querySelector('.viewer-header');
+        const controls = document.getElementById('customControls');
+        
         if (header && !document.webkitFullscreenElement) {
             header.style.opacity = '';
             header.style.pointerEvents = '';
             header.classList.remove('auto-hide');
+        }
+        
+        if (controls && !document.webkitFullscreenElement) {
+            controls.style.opacity = '';
+            controls.style.pointerEvents = '';
+            controls.classList.remove('auto-hide');
         }
     });
 });
@@ -1732,7 +1749,6 @@ function initYouTubeControls() {
                 console.log('Orientation lock failed:', e);
             }
         } else if (window.screen && window.screen.orientation) {
-            // Fallback for some browsers
             try {
                 await window.screen.orientation.lock('landscape');
             } catch (e) {
@@ -1749,13 +1765,26 @@ function initYouTubeControls() {
         
         // Auto-hide header after 2 seconds in fullscreen
         const header = document.querySelector('.viewer-header');
+        const controls = document.getElementById('customControls');
+        
         if (header) {
             header.classList.add('auto-hide');
-            setTimeout(() => {
+        }
+        
+        if (controls) {
+            controls.classList.add('auto-hide');
+        }
+        
+        setTimeout(() => {
+            if (header) {
                 header.style.opacity = '0';
                 header.style.pointerEvents = 'none';
-            }, 2000);
-        }
+            }
+            if (controls) {
+                controls.style.opacity = '0';
+                controls.style.pointerEvents = 'none';
+            }
+        }, 2000);
     };
     
     // Update progress bar
@@ -1909,13 +1938,26 @@ function initNativeVideoControls() {
         
         // Auto-hide header after 2 seconds in fullscreen
         const header = document.querySelector('.viewer-header');
+        const controls = document.getElementById('customControls');
+        
         if (header) {
             header.classList.add('auto-hide');
-            setTimeout(() => {
+        }
+        
+        if (controls) {
+            controls.classList.add('auto-hide');
+        }
+        
+        setTimeout(() => {
+            if (header) {
                 header.style.opacity = '0';
                 header.style.pointerEvents = 'none';
-            }, 2000);
-        }
+            }
+            if (controls) {
+                controls.style.opacity = '0';
+                controls.style.pointerEvents = 'none';
+            }
+        }, 2000);
     };
     
     lucide.createIcons();
