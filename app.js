@@ -1549,6 +1549,12 @@ function openModal(modalId) {
         if (bottomNav) bottomNav.style.display = 'none';
     }
     
+    // Hide navigation for note and video modals too
+    if (modalId === 'noteModal' || modalId === 'videoModal') {
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (bottomNav) bottomNav.style.display = 'none';
+    }
+    
     document.getElementById(modalId).classList.remove('hidden');
     populateSubjectSelects();
     
@@ -1612,6 +1618,12 @@ function closeModal(modalId) {
         document.body.style.position = '';
         
         // Show navigation when closing video player or PDF viewer
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (bottomNav) bottomNav.style.display = '';
+    }
+    
+    // Show navigation when closing note or video modal
+    if (modalId === 'noteModal' || modalId === 'videoModal') {
         const bottomNav = document.querySelector('.bottom-nav');
         if (bottomNav) bottomNav.style.display = '';
     }
