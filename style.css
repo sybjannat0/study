@@ -28,6 +28,7 @@
     --gradient-5: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fcd34d 100%);
     --gradient-6: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
     --gradient-reels: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    --gradient-essays: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #7dd3fc 100%);
     
     /* Glass Effects - More refined */
     --glass-bg: rgba(255, 255, 255, 0.65);
@@ -2008,12 +2009,14 @@ body::before {
 /* Override for PDF/Video viewer modals - white background */
 #pdfViewerModal,
 #videoPlayerModal {
-    background: white !important;
+    background: #000000 !important;
+    padding: 0 !important;
 }
 
 #pdfViewerModal .viewer-modal-backdrop,
 #videoPlayerModal .viewer-modal-backdrop {
-    background: white !important;
+    background: #000000 !important;
+    padding: 0;
 }
 
 .modal.hidden {
@@ -3104,6 +3107,10 @@ body::before {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
 }
 
+.section-hero.gradient-essays {
+    background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #7dd3fc 100%);
+}
+
 .hero-background {
     position: absolute;
     top: 0;
@@ -3599,6 +3606,682 @@ body::before {
     .notes-grid,
     .videos-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ============================================
+   Essays Tab
+   ============================================ */
+.essays-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 250px);
+    min-height: 500px;
+}
+
+.essays-sidebar {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.essays-sidebar h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.essays-sidebar h3 i {
+    width: 18px;
+    height: 18px;
+    color: var(--primary);
+}
+
+.drafts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.draft-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.draft-item:hover {
+    background: var(--bg-secondary);
+}
+
+.draft-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.draft-item.active .draft-date {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.draft-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.draft-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.draft-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Essay Modal */
+.essay-modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.essay-modal-backdrop.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.essay-modal {
+    width: 100%;
+    max-width: 1000px;
+    height: 90vh;
+    background: white;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    margin: 10px;
+}
+
+.essay-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    position: relative;
+}
+
+.essay-modal-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.essay-modal-title-input {
+    flex: 1;
+    border: none;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    outline: none;
+    background: transparent;
+    min-width: 200px;
+}
+
+.essay-modal-subject-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    outline: none;
+    min-width: 150px;
+}
+
+.essay-modal-subject-select:focus {
+    border-color: var(--primary);
+}
+
+/* Mobile responsive for essay modal */
+@media (max-width: 600px) {
+    .essay-modal-header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+    }
+    
+    .essay-modal-header-row {
+        width: 100%;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .essay-modal-title-input {
+        width: 100%;
+        min-width: unset;
+        font-size: 1rem;
+    }
+    
+    .essay-modal-subject-select {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .essay-modal-close {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+    }
+    
+    .essay-modal {
+        height: 95vh;
+    }
+}
+
+.essay-modal-title-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.essay-modal-close {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.essay-modal-close:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.essay-modal-editor {
+    flex: 1;
+    padding: 20px;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    overflow-y: auto;
+    outline: none;
+}
+
+.essay-modal-editor ul,
+.essay-modal-editor ol {
+    padding-left: 24px;
+    margin: 8px 0;
+}
+
+.essay-modal-editor li {
+    margin: 4px 0;
+}
+
+.essay-modal-editor:empty:before {
+    content: attr(placeholder);
+    color: var(--text-secondary);
+}
+
+.essay-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+}
+
+.essay-editor-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.essay-toolbar-row {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary);
+}
+
+.essay-editor-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+}
+
+.essay-title-input {
+    flex: 1;
+    border: none;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: transparent;
+    outline: none;
+}
+
+.essay-title-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.essay-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: visible;
+}
+
+.toolbar-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.toolbar-btn:active {
+    transform: translateY(0) scale(0.95);
+    background: var(--primary);
+    color: white;
+}
+
+.toolbar-btn.active {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    color: white;
+    box-shadow: 0 0 15px rgba(245, 87, 108, 0.6), 0 2px 8px rgba(245, 87, 108, 0.4);
+    transform: scale(1.1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.toolbar-btn.active:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 25px rgba(245, 87, 108, 0.8), 0 4px 12px rgba(245, 87, 108, 0.5);
+}
+
+.toolbar-btn.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.toolbar-btn i {
+    width: 18px;
+    height: 18px;
+}
+
+.font-size-select {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+}
+
+.font-size-select:hover {
+    border-color: var(--primary);
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    margin: 0 4px;
+}
+
+.color-picker-container {
+    position: relative;
+    display: inline-block;
+}
+
+.color-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    gap: 4px;
+    min-width: 140px;
+}
+
+.color-picker-container:hover .color-dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+.color-option {
+    width: 100%;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-option:hover {
+    transform: scale(1.05);
+}
+
+.table-picker-container {
+    position: relative;
+    display: inline-block;
+}
+
+.table-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    min-width: 200px;
+}
+
+.table-picker-container:hover .table-dropdown {
+    display: block;
+}
+
+.table-size-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.table-size-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.table-size-control {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.table-size-control label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.table-size-control input {
+    width: 60px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.essay-editor {
+    flex: 1;
+    padding: 20px;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    overflow-y: auto;
+    outline: none;
+    min-height: 300px;
+}
+
+.essay-editor:empty:before {
+    content: attr(placeholder);
+    color: var(--text-secondary);
+}
+
+.essay-editor blockquote,
+.essay-modal-editor blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: 16px;
+    margin: 12px 0;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: var(--bg-secondary);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+}
+
+.essay-editor h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 16px 0 8px 0;
+}
+
+.essay-editor h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 14px 0 6px 0;
+}
+
+.essay-editor h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 12px 0 4px 0;
+}
+
+.essay-editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+}
+
+.essay-stats {
+    display: flex;
+    gap: 16px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.essay-stats span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.essay-stats i {
+    width: 14px;
+    height: 14px;
+}
+
+.essay-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Dark mode for essay editor */
+.essay-editor-wrapper.dark-mode {
+    background: #1e1e1e;
+}
+
+.essay-editor-wrapper.dark-mode .essay-editor {
+    color: #e0e0e0;
+    background: #1e1e1e;
+}
+
+.essay-editor-wrapper.dark-mode .essay-title-input {
+    color: #e0e0e0;
+    background: #1e1e1e;
+}
+
+.essay-editor-wrapper.dark-mode .essay-editor-header {
+    border-bottom-color: #333;
+}
+
+.essay-editor-wrapper.dark-mode .essay-toolbar-row {
+    background: #2a2a2a;
+    border-bottom-color: #333;
+}
+
+.essay-editor-wrapper.dark-mode .essay-editor-footer {
+    border-top-color: #333;
+    background: #252525;
+}
+
+.essay-editor-wrapper.dark-mode .toolbar-btn:hover {
+    background: #333;
+}
+
+.essay-editor-wrapper.dark-mode .toolbar-btn.active {
+    background: #f5576c;
+    color: white;
+}
+
+.essay-editor-wrapper.dark-mode .color-dropdown {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+.essay-editor-wrapper.dark-mode .table-dropdown {
+    background: #2a2a2a;
+    border-color: #444;
+}
+
+.essay-editor-wrapper.dark-mode .table-size-label {
+    color: #e0e0e0;
+}
+
+.essay-editor-wrapper.dark-mode .table-size-control label {
+    color: #aaa;
+}
+
+.essay-editor-wrapper.dark-mode .table-size-control input {
+    background: #333;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .essays-container {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .essays-sidebar {
+        width: 100%;
+    }
+    
+    .essay-toolbar-row {
+        padding: 8px 12px;
+    }
+    
+    .essay-toolbar {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .toolbar-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .toolbar-divider {
+        display: none;
+    }
+    
+    .font-size-select {
+        margin-top: 4px;
+    }
+    
+    .color-dropdown {
+        left: auto;
+        right: 0;
+    }
+    
+    .table-dropdown {
+        left: auto;
+        right: 0;
+        min-width: 160px;
     }
 }
 
@@ -4446,13 +5129,14 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #ffffff !important;
+    background: #000000 !important;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 3000;
-    padding: 20px;
+    padding: 0;
     animation: fadeIn 0.3s ease;
+    overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -4584,6 +5268,7 @@ body::before {
     justify-content: center;
     background-color: #000000 !important;
     padding: 0;
+    overflow: hidden;
 }
 
 .video-container {
@@ -4593,6 +5278,7 @@ body::before {
     align-items: center;
     justify-content: center;
     background-color: #000000;
+    overflow: hidden;
 }
 
 .video-container video {
@@ -4673,6 +5359,7 @@ h6.bengali-text {
     background: #000000;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .custom-video-player .video-container {
@@ -4689,7 +5376,7 @@ h6.bengali-text {
     width: 100%;
     height: 100%;
     border: none;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .custom-video-player video {
@@ -4709,7 +5396,8 @@ h6.bengali-text {
     padding: 40px 20px 20px;
     opacity: 1;
     transition: opacity 0.3s ease;
-    z-index: 100;
+    z-index: 10000;
+    pointer-events: auto;
 }
 
 .progress-bar-container {
@@ -4750,9 +5438,10 @@ h6.bengali-text {
     background: #f5576c;
     border-radius: 50%;
     cursor: grab;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
 }
 
 .progress-bar:hover .progress-handle {
@@ -4852,6 +5541,7 @@ h6.bengali-text {
 
 .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     width: 12px;
     height: 12px;
     background: #f5576c;

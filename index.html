@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Personal Study Hub</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-essays.css">
   <link rel="stylesheet" href="admin-styles.css">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -163,22 +164,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Upcoming Section -->
-        <div class="content-section">
-          <div class="section-header">
-            <h3><i data-lucide="calendar"></i> Upcoming</h3>
-            <button class="view-all-btn" onclick="switchTab('planning')">
-              View All <i data-lucide="arrow-right"></i>
-            </button>
-          </div>
-          <div class="upcoming-list" id="upcomingList">
-            <div class="empty-state-small">
-              <i data-lucide="calendar-plus"></i>
-              <p>No upcoming plans</p>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- Planning Tab -->
@@ -291,6 +276,45 @@
                 <p>No to-dos</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Essays Tab -->
+      <section class="tab-content hidden" id="essaysTab">
+        <!-- Modern Hero Section -->
+        <div class="section-hero gradient-essays">
+          <div class="hero-background">
+            <div class="hero-pattern"></div>
+            <div class="floating-shapes">
+              <div class="shape shape-1"></div>
+              <div class="shape shape-2"></div>
+              <div class="shape shape-3"></div>
+              <div class="shape shape-4"></div>
+            </div>
+          </div>
+          <div class="hero-main">
+            <div class="hero-info">
+              <div class="hero-icon">
+                <i data-lucide="feather"></i>
+              </div>
+              <div class="hero-text">
+                <h1>Essays</h1>
+                <p>Write and manage your essays</p>
+              </div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn primary" id="addEssayBtn" onclick="openEssayModal()">
+                <i data-lucide="plus"></i> New Essay
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Essays Container -->
+        <div class="essays-container">
+          <div class="essays-grid" id="essaysGrid">
+            <!-- Essays will be rendered here as cards -->
           </div>
         </div>
       </section>
@@ -476,7 +500,7 @@
               <span class="status-badge active">
                 <i data-lucide="check-circle"></i> Admin Mode Active
               </span>
-              <button id="lockAdminBtn" class="lock-again-btn">
+              <button id="lockAdminBtn" class="lock-again-btn" onclick="lockAdminPanel()">
                 <i data-lucide="lock"></i> Lock
               </button>
             </div>
@@ -540,6 +564,10 @@
       <button class="nav-item active" data-tab="home" onclick="switchTab('home')">
         <i data-lucide="home"></i>
         <span>Home</span>
+      </button>
+      <button class="nav-item" data-tab="essays" onclick="switchTab('essays')">
+        <i data-lucide="feather"></i>
+        <span>Essays</span>
       </button>
       <button class="nav-item" data-tab="notes" onclick="switchTab('notes')">
         <i data-lucide="file-text"></i>
@@ -899,6 +927,176 @@
     // Initialize Lucide icons
     lucide.createIcons();
   </script>
+
+  <!-- Essay Modal -->
+  <div class="essay-modal-backdrop" id="essayModal">
+    <div class="essay-modal">
+      <div class="essay-modal-header">
+        <div class="essay-modal-header-content">
+          <div class="essay-modal-input-group">
+            <i data-lucide="file-text" class="input-icon"></i>
+            <input type="text" id="essayModalTitle" class="essay-modal-title-input" placeholder="Enter essay title...">
+          </div>
+          <div class="essay-modal-input-group">
+            <i data-lucide="bookmark" class="input-icon"></i>
+            <select id="essayModalSubject" class="essay-modal-subject-select">
+              <option value="">Select Subject</option>
+            </select>
+          </div>
+        </div>
+        <button class="essay-modal-close" onclick="closeEssayModal()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="essay-toolbar-row">
+        <div class="essay-toolbar">
+          <button class="toolbar-btn" id="formatBtnBold" onclick="formatTextModal('bold')" title="Bold">
+            <i data-lucide="bold"></i>
+          </button>
+          <button class="toolbar-btn" id="formatBtnItalic" onclick="formatTextModal('italic')" title="Italic">
+            <i data-lucide="italic"></i>
+          </button>
+          <button class="toolbar-btn" id="formatBtnUnderline" onclick="formatTextModal('underline')" title="Underline">
+            <i data-lucide="underline"></i>
+          </button>
+          <button class="toolbar-btn" id="formatBtnStrikethrough" onclick="formatTextModal('strikethrough')"
+            title="Strikethrough">
+            <i data-lucide="strikethrough"></i>
+          </button>
+          <div class="color-picker-container" id="colorPickerContainerModal">
+            <button class="toolbar-btn color-btn" id="colorBtnModal" title="Text Color"
+              onmousedown="event.preventDefault(); toggleColorDropdownModal(event)">
+              <i data-lucide="droplet"></i>
+            </button>
+            <div class="color-dropdown" id="colorDropdownModal">
+              <div class="color-option" style="background: #000000"
+                onmousedown="event.preventDefault(); applyColorModal('#000000'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #ffffff; border: 1px solid #ddd"
+                onmousedown="event.preventDefault(); applyColorModal('#ffffff'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #e74c3c"
+                onmousedown="event.preventDefault(); applyColorModal('#e74c3c'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #e67e22"
+                onmousedown="event.preventDefault(); applyColorModal('#e67e22'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #f1c40f"
+                onmousedown="event.preventDefault(); applyColorModal('#f1c40f'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #2ecc71"
+                onmousedown="event.preventDefault(); applyColorModal('#2ecc71'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #3498db"
+                onmousedown="event.preventDefault(); applyColorModal('#3498db'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #9b59b6"
+                onmousedown="event.preventDefault(); applyColorModal('#9b59b6'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #1abc9c"
+                onmousedown="event.preventDefault(); applyColorModal('#1abc9c'); hideColorDropdownModal();"></div>
+              <div class="color-option" style="background: #e91e63"
+                onmousedown="event.preventDefault(); applyColorModal('#e91e63'); hideColorDropdownModal();"></div>
+            </div>
+          </div>
+          <span class="toolbar-divider"></span>
+          <button class="toolbar-btn" onclick="formatTextModal('h1')" title="Heading 1">
+            <i data-lucide="heading"></i> 1
+          </button>
+          <button class="toolbar-btn" onclick="formatTextModal('h2')" title="Heading 2">
+            <i data-lucide="heading"></i> 2
+          </button>
+          <button class="toolbar-btn" onclick="formatTextModal('h3')" title="Heading 3">
+            <i data-lucide="heading"></i> 3
+          </button>
+          <span class="toolbar-divider"></span>
+          <button class="toolbar-btn" id="formatBtnUl" onclick="formatTextModal('ul')" title="Bullet List">
+            <i data-lucide="list"></i>
+          </button>
+          <button class="toolbar-btn" id="formatBtnOl" onclick="formatTextModal('ol')" title="Numbered List">
+            <i data-lucide="list-ordered"></i>
+          </button>
+          <span class="toolbar-divider"></span>
+          <button class="toolbar-btn" id="formatBtnAlignLeft" onclick="formatTextModal('alignLeft')" title="Align Left">
+            <i data-lucide="align-left"></i>
+          </button>
+          <button class="toolbar-btn" id="formatBtnAlignCenter" onclick="formatTextModal('alignCenter')"
+            title="Align Center">
+            <i data-lucide="align-center"></i>
+          </button>
+          <button class="toolbar-btn" id="formatBtnAlignRight" onclick="formatTextModal('alignRight')"
+            title="Align Right">
+            <i data-lucide="align-right"></i>
+          </button>
+          <span class="toolbar-divider"></span>
+          <button class="toolbar-btn" id="formatBtnQuote" onclick="formatTextModal('quote')" title="Quote">
+            <i data-lucide="quote"></i>
+          </button>
+          <button class="toolbar-btn" onclick="insertLinkModal()" title="Insert Link">
+            <i data-lucide="link"></i>
+          </button>
+          <div class="table-picker-container" id="tablePickerContainerModal">
+            <button class="toolbar-btn" title="Insert Table"
+              onmousedown="event.preventDefault(); toggleTableDropdownModal(event)">
+              <i data-lucide="table"></i>
+            </button>
+            <div class="table-dropdown" id="tableDropdownModal">
+              <div class="table-size-label">Table Size</div>
+              <div class="table-size-controls">
+                <div class="table-size-control">
+                  <label>Rows:</label>
+                  <input type="number" id="tableRowsModal" value="3" min="1" max="10">
+                </div>
+                <div class="table-size-control">
+                  <label>Cols:</label>
+                  <input type="number" id="tableColsModal" value="3" min="1" max="10">
+                </div>
+              </div>
+              <button class="btn primary btn-sm" onclick="insertCustomTableModal()">Insert Table</button>
+            </div>
+          </div>
+          <span class="toolbar-divider"></span>
+          <select class="font-size-select" onchange="formatTextModal('fontSize', this.value)">
+            <option value="normal">Size</option>
+            <option value="small">Small</option>
+            <option value="normal">Normal</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+      </div>
+      <div class="essay-modal-editor" id="essayModalEditor" contenteditable="true"
+        placeholder="Start writing your essay..."></div>
+      <div class="essay-modal-footer">
+        <div class="essay-stats">
+          <span><i data-lucide="file-text"></i> <span id="wordCountModal">0</span> words</span>
+        </div>
+        <div class="essay-actions">
+          <button class="btn secondary" onclick="saveEssayModal()">
+            <i data-lucide="save"></i> Save
+          </button>
+          <button class="btn secondary" onclick="exportEssayModal('docx')">
+            <i data-lucide="download"></i> Export
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Read Essay Modal -->
+  <div class="essay-modal-backdrop" id="readEssayModal">
+    <div class="essay-modal essay-read-modal">
+      <div class="essay-modal-header">
+        <div class="essay-modal-header-content">
+          <h2 class="essay-read-title" id="readEssayTitle"></h2>
+          <div class="essay-read-meta">
+            <span class="essay-read-subject" id="readEssaySubject"></span>
+            <span class="essay-read-date" id="readEssayDate"></span>
+          </div>
+        </div>
+        <button class="essay-modal-close" onclick="closeReadEssayModal()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="essay-read-content" id="readEssayContent"></div>
+      <div class="essay-modal-footer">
+        <div class="essay-stats">
+          <span><i data-lucide="file-text"></i> <span id="readEssayWordCount">0</span> words</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

@@ -61,7 +61,7 @@ let appState = {
     subjects: [],
     notes: [],
     videos: [],
-    reels: [],
+    essays: [],
     plans: [],
     reminders: [],
     todos: [],
@@ -390,6 +390,7 @@ async function loadData() {
                 appState.subjects = remoteData.subjects || defaultSubjects;
                 appState.notes = remoteData.notes || [];
                 appState.videos = remoteData.videos || [];
+                appState.essays = remoteData.essays || [];
                 appState.plans = remoteData.plans || [];
                 appState.reminders = remoteData.reminders || [];
                 appState.todos = remoteData.todos || [];
@@ -398,10 +399,12 @@ async function loadData() {
                 
                 // Populate settings inputs
                 const adminModeToggle = document.getElementById('adminModeToggle');
-                if (adminModeToggle) adminModeToggle.checked = appState.settings?.adminMode !== false;
+                if (adminModeToggle) adminModeToggle.checked = appState.settings?.adminMode === true;
                 
                 // Set admin elements visibility based on PIN status
-                toggleAdminElements(isAdminUnlocked);
+                const isAdminModeOn = appState.settings?.adminMode === true;
+                const isAdmin = isAdminUnlocked || isAdminModeOn;
+                toggleAdminElements(isAdmin);
                 return;
             }
         } catch (e) {
@@ -416,7 +419,7 @@ async function loadData() {
         appState.subjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBJECTS)) || defaultSubjects;
         appState.notes = JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTES)) || [];
         appState.videos = JSON.parse(localStorage.getItem(STORAGE_KEYS.VIDEOS)) || [];
-        appState.reels = JSON.parse(localStorage.getItem('appReels')) || [];
+        appState.essays = JSON.parse(localStorage.getItem('appEssays')) || [];
         appState.plans = JSON.parse(localStorage.getItem(STORAGE_KEYS.PLANS)) || [];
         appState.reminders = JSON.parse(localStorage.getItem(STORAGE_KEYS.REMINDERS)) || [];
         appState.todos = JSON.parse(localStorage.getItem(STORAGE_KEYS.TODOS)) || [];
@@ -424,10 +427,12 @@ async function loadData() {
         
         // Populate settings inputs
         const adminModeToggle = document.getElementById('adminModeToggle');
-        if (adminModeToggle) adminModeToggle.checked = appState.settings?.adminMode !== false;
+        if (adminModeToggle) adminModeToggle.checked = appState.settings?.adminMode === true;
         
         // Set admin elements visibility based on PIN status
-        toggleAdminElements(isAdminUnlocked);
+        const isAdminModeOn = appState.settings?.adminMode === true;
+        const isAdmin = isAdminUnlocked || isAdminModeOn;
+        toggleAdminElements(isAdmin);
     } catch (e) {
         console.error('Error loading data:', e);
         showToast('Error loading data', 'error');
@@ -441,7 +446,7 @@ async function saveData() {
         localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(appState.subjects));
         localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(appState.notes));
         localStorage.setItem(STORAGE_KEYS.VIDEOS, JSON.stringify(appState.videos));
-        localStorage.setItem('appReels', JSON.stringify(appState.reels));
+        localStorage.setItem('appEssays', JSON.stringify(appState.essays));
         localStorage.setItem(STORAGE_KEYS.PLANS, JSON.stringify(appState.plans));
         localStorage.setItem(STORAGE_KEYS.REMINDERS, JSON.stringify(appState.reminders));
         localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(appState.todos));
@@ -458,6 +463,7 @@ async function saveData() {
                 subjects: appState.subjects,
                 notes: appState.notes,
                 videos: appState.videos,
+                essays: appState.essays,
                 plans: appState.plans,
                 reminders: appState.reminders,
                 todos: appState.todos,
@@ -484,8 +490,22 @@ async function saveData() {
 // ============================================
 // Toggle Admin Elements
 // ============================================
-function toggleAdminElements(isAdmin) {
-    console.log('toggleAdminElements called, isAdmin:', isAdmin);
+function toggleAdminElements(forceAdmin) {
+    console.log('toggleAdminElements called, isAdminUnlocked:', isAdminUnlocked, 'forceAdmin:', forceAdmin);
+    
+    // Use the forceAdmin parameter if provided, otherwise determine from state
+    // forceAdmin is passed from showAdminPanel/showAdminLockScreen
+    let isAdmin = false;
+    if (typeof forceAdmin === 'boolean') {
+        isAdmin = forceAdmin;
+    } else {
+        // Check both session state and settings for admin
+        const isAdminModeOn = appState.settings?.adminMode === true;
+        isAdmin = isAdminUnlocked || isAdminModeOn;
+    }
+    
+    console.log('Final isAdmin:', isAdmin);
+    
     // Hide/Show Add buttons for Notes and Videos
     const addNoteBtn = document.getElementById('addNoteBtn');
     const addVideoBtn = document.getElementById('addVideoBtn');
@@ -497,17 +517,25 @@ function toggleAdminElements(isAdmin) {
         addVideoBtn.style.display = isAdmin ? 'flex' : 'none';
     }
     
+    // Hide/Show Add button for Essays
+    const addEssayBtn = document.getElementById('addEssayBtn');
+    if (addEssayBtn) {
+        addEssayBtn.style.display = isAdmin ? 'flex' : 'none';
+    }
+    
     // Hide/Show Settings sections (except admin section which is always visible)
     const settingsSections = document.querySelectorAll('#settingsTab .settings-section');
-    console.log('Found settings sections:', settingsSections.length);
     settingsSections.forEach(section => {
-        // Keep Admin section visible always, hide other sections when not admin
         const isAdminSection = section.classList.contains('admin-section');
-        console.log('Section:', section.className, 'isAdminSection:', isAdminSection);
         if (!isAdminSection) {
             section.style.display = isAdmin ? '' : 'none';
         }
     });
+    
+    // Re-render essays grid to show/hide edit and delete buttons
+    if (typeof renderEssaysGrid === 'function') {
+        renderEssaysGrid();
+    }
 }
 
 // ============================================
@@ -774,8 +802,12 @@ function setupEventListeners() {
         showAdminLockScreen();
         renderNotes();
         renderVideos();
+        renderEssaysGrid();
         showToast('Admin mode locked', 'info');
     }
+    
+    // Export function globally
+    window.lockAdminPanel = lockAdminPanel;
 
     function showAdminPanel() {
         const lockScreen = document.getElementById('adminLockScreen');
@@ -789,6 +821,11 @@ function setupEventListeners() {
                 section.style.display = '';
             }
         });
+        // Re-render grids to show/hide admin elements
+        renderNotes();
+        renderVideos();
+        renderEssaysGrid();
+        toggleAdminElements(true);
     }
 
     function showAdminLockScreen() {
@@ -810,6 +847,11 @@ function setupEventListeners() {
                 section.style.display = 'none';
             }
         });
+        // Re-render grids to hide admin elements
+        renderNotes();
+        renderVideos();
+        renderEssaysGrid();
+        toggleAdminElements(false);
     }
 
     // Initialize admin state - always call the appropriate function
@@ -905,7 +947,6 @@ function showTab(tabName) {
         updateHeroStats();
         renderRecentNotes();
         renderRecentVideos();
-        renderUpcoming();
     } else if (tabName === 'notes') {
         renderNotes();
         renderSubjects();
@@ -920,6 +961,8 @@ function showTab(tabName) {
             const uniqueSubjects = new Set(appState.notes.map(n => n.subjectId).filter(Boolean));
             notesSubjectsCount.textContent = uniqueSubjects.size;
         }
+    } else if (tabName === 'essays') {
+        renderEssaysGrid();
     } else if (tabName === 'videos') {
         renderVideos();
         populateSubjectSelects();
@@ -1003,7 +1046,6 @@ function renderAll() {
     updateHeroStats();
     renderRecentNotes();
     renderRecentVideos();
-    renderUpcoming();
     renderNotes();
     renderVideos();
     renderSubjects();
@@ -1415,6 +1457,897 @@ function playReel(reelId) {
     }
 }
 
+// Essay Functions
+let currentEssayId = null;
+let essayDarkMode = false;
+let essayAutosaveInterval = null;
+
+function deleteEssayById(id) {
+    const essay = appState.essays.find(e => e.id === id);
+    const essayTitle = essay?.title || 'this essay';
+    
+    // Show confirmation modal
+    document.getElementById('confirmMessage').textContent = `Are you sure you want to delete "${essayTitle}"? This action cannot be undone.`;
+    document.getElementById('confirmModal').classList.remove('hidden');
+    
+    // Set up one-time confirm handler
+    const confirmBtn = document.getElementById('confirmBtn');
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    newConfirmBtn.onclick = function() {
+        appState.essays = appState.essays.filter(e => e.id !== id);
+        if (window.currentEssayId === id) {
+            window.currentEssayId = null;
+        }
+        saveData();
+        renderEssaysGrid();
+        closeModal('confirmModal');
+        showToast('Essay deleted', 'success');
+    };
+}
+
+function renderEssaysGrid() {
+    const container = document.getElementById('essaysGrid');
+    if (!container) return;
+    
+    // Check if admin is unlocked
+    const isAdmin = isAdminUnlocked || appState.settings?.adminMode !== false;
+    
+    if (appState.essays.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i data-lucide="file-text"></i>
+                <p>No essays yet. ${isAdmin ? 'Click "New Essay" to start writing!' : 'Check back later for essays.'}</p>
+            </div>
+        `;
+    } else {
+        container.innerHTML = appState.essays.map(essay => {
+            const subject = appState.subjects.find(s => s.id === essay.subjectId);
+            const subjectColor = subject?.color || '#6366f1';
+            const subjectName = subject?.name || 'No Subject';
+            const preview = essay.content ? essay.content.replace(/<[^>]*>/g, '').substring(0, 100) : 'No content';
+            
+            // Calculate word count dynamically from content
+            const textContent = essay.content ? essay.content.replace(/<[^>]*>/g, '') : '';
+            const wordCount = textContent.trim() ? textContent.trim().split(/\s+/).length : 0;
+            
+            // Format date as "01 Mar, 2026"
+            const dateObj = new Date(essay.date);
+            const formattedDate = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            
+            // Only show edit/delete buttons for admin
+            const adminButtons = isAdmin ? `
+                <button class="essay-card-delete" onclick="event.stopPropagation(); deleteEssayById('${essay.id}')" title="Delete essay">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            ` : '';
+            
+            const actionButtons = isAdmin ? `
+                <div class="essay-card-actions">
+                    <button class="btn secondary btn-sm" onclick="openEssayModalWithId('${essay.id}')">
+                        <i data-lucide="edit-2"></i> Edit
+                    </button>
+                    <button class="btn primary btn-sm" onclick="openReadEssayModal('${essay.id}')">
+                        <i data-lucide="book-open"></i> Read Full Essay
+                    </button>
+                </div>
+            ` : `
+                <div class="essay-card-actions">
+                    <button class="btn primary btn-sm" onclick="openReadEssayModal('${essay.id}')">
+                        <i data-lucide="book-open"></i> Read Full Essay
+                    </button>
+                </div>
+            `;
+            
+            return `
+                <div class="essay-card">
+                    <div class="essay-card-header">
+                        <span class="essay-subject" style="background: ${subjectColor}20; color: ${subjectColor}">${escapeHtml(subjectName)}</span>
+                        ${adminButtons}
+                    </div>
+                    <h3 class="essay-card-title">${escapeHtml(essay.title || 'Untitled')}</h3>
+                    <p class="essay-card-preview">${escapeHtml(preview)}${essay.content && essay.content.length > 100 ? '...' : ''}</p>
+                    <div class="essay-card-footer">
+                        <span class="essay-card-date">${formattedDate}</span>
+                        <span class="essay-card-words">${wordCount} words</span>
+                    </div>
+                    ${actionButtons}
+                </div>
+            `;
+        }).join('');
+    }
+    
+    if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 100);
+    }
+}
+
+function newEssay() {
+    currentEssayId = null;
+    document.getElementById('essayModalTitle').value = '';
+    document.getElementById('essayModalEditor').innerHTML = '';
+    updateEssayStats();
+    renderEssaysGrid();
+}
+
+function loadEssay(id) {
+    const essay = appState.essays.find(e => e.id === id);
+    if (!essay) return;
+    
+    currentEssayId = essay.id;
+    document.getElementById('essayModalTitle').value = essay.title || '';
+    document.getElementById('essayModalEditor').innerHTML = essay.content || '';
+    updateEssayStats();
+    renderEssaysGrid();
+}
+
+function saveEssay() {
+    const title = document.getElementById('essayModalTitle').value || 'Untitled';
+    const content = document.getElementById('essayModalEditor').innerHTML;
+    
+    if (currentEssayId) {
+        const essay = appState.essays.find(e => e.id === currentEssayId);
+        if (essay) {
+            essay.title = title;
+            essay.content = content;
+            essay.date = new Date().toISOString();
+            essay.wordCount = document.getElementById('wordCount').textContent;
+        }
+    } else {
+        const newEssay = {
+            id: generateId(),
+            title: title,
+            content: content,
+            date: new Date().toISOString(),
+            wordCount: document.getElementById('wordCount').textContent
+        };
+        appState.essays.unshift(newEssay);
+        currentEssayId = newEssay.id;
+    }
+    
+    saveData();
+    renderEssaysGrid();
+    showToast('Essay saved', 'success');
+}
+
+function deleteEssay(id) {
+    if (!confirm('Are you sure you want to delete this essay?')) return;
+    
+    appState.essays = appState.essays.filter(e => e.id !== id);
+    if (currentEssayId === id) {
+        newEssay();
+    }
+    saveData();
+    renderEssaysGrid();
+    showToast('Essay deleted', 'success');
+}
+
+function formatText(command, value = null) {
+    const editor = document.getElementById('essayModalEditor');
+    
+    switch(command) {
+        case 'bold':
+            document.execCommand('bold', false, null);
+            break;
+        case 'italic':
+            document.execCommand('italic', false, null);
+            break;
+        case 'underline':
+            document.execCommand('underline', false, null);
+            break;
+        case 'strikethrough':
+            document.execCommand('strikeThrough', false, null);
+            break;
+        case 'color':
+            if (value) {
+                // First try execCommand which is more reliable
+                document.execCommand('foreColor', false, value);
+                document.getElementById('essayModalEditor').focus();
+            }
+            break;
+        case 'h1':
+            document.execCommand('formatBlock', false, '<h1>');
+            break;
+        case 'h2':
+            document.execCommand('formatBlock', false, '<h2>');
+            break;
+        case 'h3':
+            document.execCommand('formatBlock', false, '<h3>');
+            break;
+        case 'ul':
+            document.execCommand('insertUnorderedList', false, null);
+            break;
+        case 'ol':
+            document.execCommand('insertOrderedList', false, null);
+            break;
+        case 'quote':
+            // Check if already in a blockquote - if so, remove it
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                let container = range.commonAncestorContainer;
+                
+                // Find if we're inside a blockquote
+                let blockquote = container.nodeType === 1 ? container.closest('blockquote') : null;
+                if (!blockquote && container.nodeType === 3) {
+                    blockquote = container.parentElement.closest('blockquote');
+                }
+                
+                if (blockquote && blockquote.parentNode) {
+                    // We're inside a blockquote, unwrap it
+                    const parent = blockquote.parentNode;
+                    while (blockquote.firstChild) {
+                        parent.insertBefore(blockquote.firstChild, blockquote);
+                    }
+                    parent.removeChild(blockquote);
+                } else {
+                    // Not in a blockquote, add one
+                    const selectedText = range.toString();
+                    if (selectedText) {
+                        const newBlockquote = document.createElement('blockquote');
+                        newBlockquote.innerHTML = range.toString();
+                        range.deleteContents();
+                        range.insertNode(newBlockquote);
+                    } else {
+                        document.execCommand('formatBlock', false, '<blockquote>');
+                    }
+                }
+            }
+            break;
+        case 'alignLeft':
+            document.execCommand('justifyLeft', false, null);
+            break;
+        case 'alignCenter':
+            document.execCommand('justifyCenter', false, null);
+            break;
+        case 'alignRight':
+            document.execCommand('justifyRight', false, null);
+            break;
+        case 'fontSize':
+            // Use fontSize with value 1 (small), 3 (normal), 5 (large)
+            const sizeMap = { 'small': '1', 'normal': '3', 'large': '5' };
+            document.execCommand('fontSize', false, sizeMap[value] || '3');
+            break;
+        case 'table':
+            insertTable(value || 3, 3); // Default 3x3 table
+            break;
+        default:
+            document.execCommand(command, false, value);
+    }
+    
+    const editorEl = document.getElementById('essayModalEditor');
+    if (editorEl) {
+        editorEl.focus();
+        updateToolbarState();
+    }
+}
+
+function updateToolbarState() {
+    // Update active state for formatting buttons
+    const editorEl = document.getElementById('essayModalEditor');
+    const commands = ['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList', 'justifyLeft', 'justifyCenter', 'justifyRight'];
+    const commandMap = {
+        'bold': 'formatBtnBold',
+        'italic': 'formatBtnItalic',
+        'underline': 'formatBtnUnderline',
+        'strikeThrough': 'formatBtnStrikethrough',
+        'insertUnorderedList': 'formatBtnUl',
+        'insertOrderedList': 'formatBtnOl',
+        'justifyLeft': 'formatBtnAlignLeft',
+        'justifyCenter': 'formatBtnAlignCenter',
+        'justifyRight': 'formatBtnAlignRight'
+    };
+    
+    commands.forEach(cmd => {
+        const btnId = commandMap[cmd];
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            const isActive = document.queryCommandState(cmd);
+            btn.classList.toggle('active', isActive);
+        }
+    });
+    
+    // Check for blockquote
+    const quoteBtn = document.getElementById('formatBtnQuote');
+    if (quoteBtn && editorEl) {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            let container = selection.getRangeAt(0).commonAncestorContainer;
+            let inBlockquote = false;
+            if (container.nodeType === 1) {
+                inBlockquote = container.closest('blockquote') !== null;
+            } else if (container.nodeType === 3) {
+                inBlockquote = container.parentElement.closest('blockquote') !== null;
+            }
+            quoteBtn.classList.toggle('active', inBlockquote);
+        }
+    }
+    
+    // Check for text color
+    const colorBtn = document.getElementById('colorBtn');
+    if (colorBtn && editorEl) {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            let container = selection.getRangeAt(0).commonAncestorContainer;
+            let hasColor = false;
+            if (container.nodeType === 1) {
+                hasColor = container.style && container.style.color !== '';
+                if (!hasColor && container.closest) {
+                    const parentWithColor = container.closest('[style*="color"]');
+                    hasColor = parentWithColor !== null;
+                }
+            } else if (container.nodeType === 3) {
+                hasColor = container.parentElement.style && container.parentElement.style.color !== '';
+                if (!hasColor && container.parentElement.closest) {
+                    const parentWithColor = container.parentElement.closest('[style*="color"]');
+                    hasColor = parentWithColor !== null;
+                }
+            }
+            colorBtn.classList.toggle('active', hasColor);
+        }
+    }
+}
+
+function hideColorDropdown() {
+    const dropdown = document.getElementById('colorDropdown');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+function focusEditorForColor() {
+    const editor = document.getElementById('essayModalEditor');
+    if (editor) {
+        editor.focus();
+        updateToolbarState();
+    }
+}
+
+function applyColor(color) {
+    const editor = document.getElementById('essayModalEditor');
+    if (!editor) return;
+    
+    // First focus the editor
+    editor.focus();
+    
+    // Use execCommand which works reliably
+    const success = document.execCommand('foreColor', false, color);
+    console.log('Color applied:', color, 'Success:', success);
+    
+    // Update toolbar state
+    updateToolbarState();
+}
+
+// Close color dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const colorPicker = document.getElementById('colorPickerContainer');
+    const dropdown = document.getElementById('colorDropdown');
+    if (colorPicker && dropdown && !colorPicker.contains(e.target)) {
+        dropdown.style.display = 'none';
+    }
+    
+    // Also handle modal color dropdown
+    const colorPickerModal = document.getElementById('colorPickerContainerModal');
+    const dropdownModal = document.getElementById('colorDropdownModal');
+    if (colorPickerModal && dropdownModal && !colorPickerModal.contains(e.target)) {
+        dropdownModal.style.display = 'none';
+    }
+    
+    // Also handle modal table dropdown
+    const tablePickerModal = document.getElementById('tablePickerContainerModal');
+    const tableDropdownModal = document.getElementById('tableDropdownModal');
+    if (tablePickerModal && tableDropdownModal && !tablePickerModal.contains(e.target)) {
+        tableDropdownModal.style.display = 'none';
+    }
+});
+
+function insertTable(rows, cols) {
+    let tableHTML = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+    for (let i = 0; i < rows; i++) {
+        tableHTML += '<tr>';
+        for (let j = 0; j < cols; j++) {
+            tableHTML += '<td style="padding: 8px; border: 1px solid #ddd;">&nbsp;</td>';
+        }
+        tableHTML += '</tr>';
+    }
+    tableHTML += '</table><br>';
+    
+    document.getElementById('essayModalEditor').focus();
+    document.execCommand('insertHTML', false, tableHTML);
+}
+
+function insertCustomTable() {
+    const rows = parseInt(document.getElementById('tableRows').value) || 3;
+    const cols = parseInt(document.getElementById('tableCols').value) || 3;
+    insertTable(rows, cols);
+    
+    // Hide dropdown
+    const dropdown = document.getElementById('tableDropdown');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+// Essay Modal Functions
+function openEssayModal() {
+    const modal = document.getElementById('essayModal');
+    
+    if (modal) {
+        modal.classList.add('active');
+        document.body.classList.add('essay-modal-open');
+        
+        document.getElementById('essayModalTitle').value = '';
+        document.getElementById('essayModalEditor').innerHTML = '';
+        document.getElementById('wordCountModal').textContent = '0';
+        
+        // Populate subject dropdown
+        const subjectSelect = document.getElementById('essayModalSubject');
+        if (subjectSelect) {
+            subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            appState.subjects.forEach(subject => {
+                subjectSelect.innerHTML += `<option value="${subject.id}">${escapeHtml(subject.name)}</option>`;
+            });
+            subjectSelect.value = '';
+        }
+        
+        document.getElementById('essayModalEditor').focus();
+        
+        // Add event listener for stats
+        const editor = document.getElementById('essayModalEditor');
+        editor.addEventListener('input', updateEssayStatsModal);
+        editor.addEventListener('keyup', updateToolbarStateModal);
+        editor.addEventListener('keydown', updateToolbarStateModal);
+        editor.addEventListener('mouseup', updateToolbarStateModal);
+        editor.addEventListener('input', updateToolbarStateModal);
+    }
+}
+
+function openEssayModalWithId(id) {
+    const essay = appState.essays.find(e => e.id === id);
+    const modal = document.getElementById('essayModal');
+    
+    if (modal && essay) {
+        modal.classList.add('active');
+        document.body.classList.add('essay-modal-open');
+        
+        window.currentEssayId = essay.id;
+        document.getElementById('essayModalTitle').value = essay.title || '';
+        document.getElementById('essayModalEditor').innerHTML = essay.content || '';
+        
+        // Populate subject dropdown
+        const subjectSelect = document.getElementById('essayModalSubject');
+        if (subjectSelect) {
+            subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            appState.subjects.forEach(subject => {
+                subjectSelect.innerHTML += `<option value="${subject.id}">${escapeHtml(subject.name)}</option>`;
+            });
+            subjectSelect.value = essay.subjectId || '';
+        }
+        
+        updateEssayStatsModal();
+        
+        document.getElementById('essayModalEditor').focus();
+        
+        // Add event listener for stats
+        const editor = document.getElementById('essayModalEditor');
+        editor.addEventListener('input', updateEssayStatsModal);
+        editor.addEventListener('keyup', updateToolbarStateModal);
+        editor.addEventListener('keydown', updateToolbarStateModal);
+        editor.addEventListener('mouseup', updateToolbarStateModal);
+        editor.addEventListener('input', updateToolbarStateModal);
+    }
+}
+
+function closeEssayModal() {
+    const modal = document.getElementById('essayModal');
+    
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('essay-modal-open');
+        window.currentEssayId = null;
+    }
+}
+
+function openReadEssayModal(id) {
+    const essay = appState.essays.find(e => e.id === id);
+    if (!essay) {
+        showToast('Essay not found', 'error');
+        return;
+    }
+    
+    const modal = document.getElementById('readEssayModal');
+    if (!modal) {
+        showToast('Read modal not found', 'error');
+        return;
+    }
+    
+    // Get subject info
+    const subject = appState.subjects.find(s => s.id === essay.subjectId);
+    const subjectColor = subject?.color || '#6366f1';
+    const subjectName = subject?.name || 'No Subject';
+    
+    // Format date
+    const dateObj = new Date(essay.date);
+    const formattedDate = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    
+    // Calculate word count
+    const textContent = essay.content ? essay.content.replace(/<[^>]*>/g, '') : '';
+    const wordCount = textContent.trim() ? textContent.trim().split(/\s+/).length : 0;
+    
+    // Set content
+    document.getElementById('readEssayTitle').textContent = essay.title || 'Untitled';
+    document.getElementById('readEssaySubject').textContent = subjectName;
+    document.getElementById('readEssaySubject').style.background = subjectColor + '20';
+    document.getElementById('readEssaySubject').style.color = subjectColor;
+    document.getElementById('readEssayDate').textContent = formattedDate;
+    document.getElementById('readEssayContent').innerHTML = essay.content || '<p>No content</p>';
+    document.getElementById('readEssayWordCount').textContent = wordCount;
+    
+    // Show modal
+    modal.classList.add('active');
+    document.body.classList.add('essay-modal-open');
+    
+    // Refresh icons
+    if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 100);
+    }
+}
+
+function closeReadEssayModal() {
+    const modal = document.getElementById('readEssayModal');
+    
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('essay-modal-open');
+    }
+}
+
+function saveEssayModal() {
+    const title = document.getElementById('essayModalTitle').value || 'Untitled';
+    const content = document.getElementById('essayModalEditor').innerHTML;
+    const subjectId = document.getElementById('essayModalSubject')?.value || null;
+    
+    // Get current essay ID or create new
+    const currentId = window.currentEssayId || null;
+    
+    if (currentId) {
+        // Update existing
+        const essay = appState.essays.find(e => e.id === currentId);
+        if (essay) {
+            essay.title = title;
+            essay.content = content;
+            essay.subjectId = subjectId;
+            essay.date = new Date().toISOString();
+        }
+    } else {
+        // Create new
+        const newEssay = {
+            id: 'essay_' + Date.now(),
+            title: title,
+            content: content,
+            subjectId: subjectId,
+            date: new Date().toISOString()
+        };
+        appState.essays.push(newEssay);
+    }
+    
+    saveData();
+    renderEssaysGrid();
+    closeEssayModal();
+    showToast('Essay saved', 'success');
+}
+
+function exportEssayModal(format) {
+    const title = document.getElementById('essayModalTitle').value || 'essay';
+    const content = document.getElementById('essayModalEditor').innerText;
+    
+    if (format === 'txt') {
+        const blob = new Blob([content], { type: 'text/plain' });
+        downloadFile(blob, `${title}.txt`);
+    } else if (format === 'docx') {
+        const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>' + title + '</title></head><body>';
+        const footer = '</body></html>';
+        const html = header + document.getElementById('essayModalEditor').innerHTML + footer;
+        const blob = new Blob([html], { type: 'application/msword' });
+        downloadFile(blob, `${title}.doc`);
+    }
+}
+
+function updateEssayStatsModal() {
+    const editor = document.getElementById('essayModalEditor');
+    if (!editor) return;
+    
+    const text = editor.innerText || '';
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    
+    document.getElementById('wordCountModal').textContent = words;
+}
+
+function updateToolbarStateModal() {
+    const editor = document.getElementById('essayModalEditor');
+    
+    // Update formatting buttons
+    const commands = ['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList', 'justifyLeft', 'justifyCenter', 'justifyRight'];
+    const commandMap = {
+        'bold': 'formatBtnBold',
+        'italic': 'formatBtnItalic',
+        'underline': 'formatBtnUnderline',
+        'strikeThrough': 'formatBtnStrikethrough',
+        'insertUnorderedList': 'formatBtnUl',
+        'insertOrderedList': 'formatBtnOl',
+        'justifyLeft': 'formatBtnAlignLeft',
+        'justifyCenter': 'formatBtnAlignCenter',
+        'justifyRight': 'formatBtnAlignRight'
+    };
+    
+    commands.forEach(cmd => {
+        const btnId = commandMap[cmd];
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            const isActive = document.queryCommandState(cmd);
+            btn.classList.toggle('active', isActive);
+        }
+    });
+    
+    // Special handling for quote (blockquote)
+    const quoteBtn = document.getElementById('formatBtnQuote');
+    if (quoteBtn) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            let container = range.commonAncestorContainer;
+            let inBlockquote = container.nodeType === 1 ? container.closest('blockquote') !== null : false;
+            if (!inBlockquote && container.nodeType === 3) {
+                inBlockquote = container.parentElement && container.parentElement.closest('blockquote') !== null;
+            }
+            quoteBtn.classList.toggle('active', inBlockquote);
+        }
+    }
+}
+
+function applyColorModal(color) {
+    const editor = document.getElementById('essayModalEditor');
+    if (!editor) return;
+    
+    editor.focus();
+    document.execCommand('foreColor', false, color);
+    updateToolbarStateModal();
+}
+
+function focusEditorForColorModal() {
+    const editor = document.getElementById('essayModalEditor');
+    if (editor) {
+        editor.focus();
+        updateToolbarStateModal();
+    }
+}
+
+function hideColorDropdownModal() {
+    const dropdown = document.getElementById('colorDropdownModal');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+function toggleColorDropdownModal(e) {
+    if (e) e.preventDefault();
+    const editor = document.getElementById('essayModalEditor');
+    if (editor) {
+        editor.focus();
+    }
+    const dropdown = document.getElementById('colorDropdownModal');
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function toggleTableDropdownModal(e) {
+    if (e) e.preventDefault();
+    const editor = document.getElementById('essayModalEditor');
+    if (editor) {
+        editor.focus();
+    }
+    const dropdown = document.getElementById('tableDropdownModal');
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function insertLinkModal() {
+    const editor = document.getElementById('essayModalEditor');
+    if (!editor) return;
+    
+    const url = prompt('Enter URL:');
+    if (url) {
+        editor.focus();
+        document.execCommand('createLink', false, url);
+    }
+}
+
+function insertCustomTableModal() {
+    const rows = parseInt(document.getElementById('tableRowsModal').value) || 3;
+    const cols = parseInt(document.getElementById('tableColsModal').value) || 3;
+    
+    let tableHTML = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+    for (let i = 0; i < rows; i++) {
+        tableHTML += '<tr>';
+        for (let j = 0; j < cols; j++) {
+            tableHTML += '<td style="padding: 8px; border: 1px solid #ddd;">&nbsp;</td>';
+        }
+        tableHTML += '</tr>';
+    }
+    tableHTML += '</table><br>';
+    
+    const editor = document.getElementById('essayModalEditor');
+    if (!editor) return;
+    
+    editor.focus();
+    
+    // Try execCommand first
+    const success = document.execCommand('insertHTML', false, tableHTML);
+    
+    // If execCommand doesn't work, try using Selection API
+    if (!success) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.deleteContents();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = tableHTML;
+            range.insertNode(tempDiv);
+        }
+    }
+    
+    // Hide dropdown
+    const dropdown = document.getElementById('tableDropdownModal');
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+// Modal-specific formatting functions
+function formatTextModal(command, value = null) {
+    const editor = document.getElementById('essayModalEditor');
+    if (!editor) return;
+    
+    switch(command) {
+        case 'bold':
+            document.execCommand('bold', false, null);
+            break;
+        case 'italic':
+            document.execCommand('italic', false, null);
+            break;
+        case 'underline':
+            document.execCommand('underline', false, null);
+            break;
+        case 'strikethrough':
+            document.execCommand('strikeThrough', false, null);
+            break;
+        case 'h1':
+            document.execCommand('formatBlock', false, '<h1>');
+            break;
+        case 'h2':
+            document.execCommand('formatBlock', false, '<h2>');
+            break;
+        case 'h3':
+            document.execCommand('formatBlock', false, '<h3>');
+            break;
+        case 'ul':
+            document.execCommand('insertUnorderedList', false, null);
+            break;
+        case 'ol':
+            document.execCommand('insertOrderedList', false, null);
+            break;
+        case 'alignLeft':
+            document.execCommand('justifyLeft', false, null);
+            break;
+        case 'alignCenter':
+            document.execCommand('justifyCenter', false, null);
+            break;
+        case 'alignRight':
+            document.execCommand('justifyRight', false, null);
+            break;
+        case 'quote':
+            // First focus the editor
+            editor.focus();
+            
+            // Check if already in a blockquote - if so, remove it, otherwise add it
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                let container = range.commonAncestorContainer;
+                
+                // Find if we're inside a blockquote
+                let blockquote = container.nodeType === 1 ? container.closest('blockquote') : null;
+                if (!blockquote && container.nodeType === 3) {
+                    blockquote = container.parentElement.closest('blockquote');
+                }
+                
+                if (blockquote && blockquote.parentNode) {
+                    // We're inside a blockquote, unwrap it
+                    const parent = blockquote.parentNode;
+                    while (blockquote.firstChild) {
+                        parent.insertBefore(blockquote.firstChild, blockquote);
+                    }
+                    parent.removeChild(blockquote);
+                } else {
+                    // Not in a blockquote, use formatBlock to add one
+                    document.execCommand('formatBlock', false, '<blockquote>');
+                }
+            }
+            break;
+    }
+    
+    editor.focus();
+    updateToolbarStateModal();
+}
+
+function insertLink() {
+    const url = prompt('Enter URL:');
+    if (url) {
+        document.execCommand('createLink', false, url);
+    }
+}
+
+function toggleFullscreen() {
+    const editor = document.querySelector('.essay-editor-wrapper');
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else {
+        editor.requestFullscreen();
+    }
+}
+
+function toggleEssayDarkMode() {
+    essayDarkMode = !essayDarkMode;
+    const wrapper = document.querySelector('.essay-editor-wrapper');
+    if (wrapper) {
+        wrapper.classList.toggle('dark-mode', essayDarkMode);
+    }
+}
+
+function updateEssayStats() {
+    const editor = document.getElementById('essayModalEditor');
+    if (!editor) return;
+    
+    const text = editor.innerText || '';
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    
+    const wordCountEl = document.getElementById('wordCountModal');
+    if (wordCountEl) wordCountEl.textContent = words;
+}
+
+function exportEssayModal(format) {
+    const title = document.getElementById('essayModalTitle').value || 'essay';
+    const content = document.getElementById('essayModalEditor').innerText;
+    
+    if (format === 'txt') {
+        const blob = new Blob([content], { type: 'text/plain' });
+        downloadFile(blob, `${title}.txt`);
+    } else if (format === 'docx') {
+        // Simple HTML to DOCX conversion
+        const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>' + title + '</title></head><body>';
+        const footer = '</body></html>';
+        const html = header + document.getElementById('essayModalEditor').innerHTML + footer;
+        const blob = new Blob([html], { type: 'application/msword' });
+        downloadFile(blob, `${title}.doc`);
+    }
+    
+    showToast('Essay exported', 'success');
+}
+
+function downloadFile(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 function renderVideos() {
     const container = document.getElementById('videosGrid');
     if (!container) return;
@@ -1752,6 +2685,12 @@ function closeModal(modalId) {
             playerContainer.innerHTML = '';
         }
         
+        // Reset loading state
+        const customPlayer = document.getElementById('customVideoPlayer');
+        if (customPlayer) {
+            customPlayer.classList.remove('loading');
+        }
+        
         // Navigate to videos tab after closing video player
         showTab('videos');
     }
@@ -2069,7 +3008,7 @@ function openVideoPlayer(id) {
                             videoId: videoId,
                             playerVars: {
                                 'autoplay': 1,
-                                'controls': 0,
+                                'controls': 1,
                                 'disablekb': 1,
                                 'fs': 0,
                                 'modestbranding': 1,
@@ -2094,11 +3033,18 @@ function openVideoPlayer(id) {
                 createPlayer();
                 openModal('videoPlayerModal');
                 
-                // Ensure controls are visible
+                // Fallback: remove loading after 3 seconds in case API fails
+                setTimeout(() => {
+                    const customPlayer = document.getElementById('customVideoPlayer');
+                    if (customPlayer && customPlayer.classList.contains('loading')) {
+                        customPlayer.classList.remove('loading');
+                    }
+                }, 3000);
+                
+                // Hide custom controls since YouTube native controls are enabled
                 const customControls = document.getElementById('customControls');
                 if (customControls) {
-                    customControls.style.opacity = '1';
-                    customControls.classList.remove('auto-hide');
+                    customControls.style.display = 'none';
                 }
                 
                 // Re-initialize Lucide icons
@@ -2133,6 +3079,14 @@ function openVideoPlayer(id) {
         nativeVideo.style.display = 'block';
         nativeVideo.src = video.videoUrl;
         initNativeVideoControls();
+        
+        // Show custom controls for native video
+        const customControls = document.getElementById('customControls');
+        if (customControls) {
+            customControls.style.display = 'flex';
+            customControls.style.opacity = '1';
+        }
+        
         openModal('videoPlayerModal');
     } else {
         showToast('No video source', 'info');
@@ -2550,6 +3504,41 @@ window.openVideoPlayer = openVideoPlayer;
 window.openNoteModal = openNoteModal;
 window.playReel = playReel;
 window.openVideoModal = openVideoModal;
+
+// Essay functions
+exportFunction(newEssay);
+exportFunction(loadEssay);
+exportFunction(saveEssay);
+exportFunction(deleteEssay);
+exportFunction(deleteEssayById);
+exportFunction(formatText);
+exportFunction(insertTable);
+exportFunction(insertCustomTable);
+exportFunction(insertLink);
+exportFunction(toggleFullscreen);
+exportFunction(toggleEssayDarkMode);
+exportFunction(exportEssay);
+exportFunction(updateEssayStats);
+exportFunction(updateToolbarState);
+exportFunction(hideColorDropdown);
+exportFunction(focusEditorForColor);
+exportFunction(applyColor);
+exportFunction(openEssayModal);
+exportFunction(closeEssayModal);
+exportFunction(saveEssayModal);
+exportFunction(openReadEssayModal);
+exportFunction(closeReadEssayModal);
+exportFunction(exportEssayModal);
+exportFunction(updateEssayStatsModal);
+exportFunction(updateToolbarStateModal);
+exportFunction(applyColorModal);
+exportFunction(focusEditorForColorModal);
+exportFunction(hideColorDropdownModal);
+exportFunction(toggleColorDropdownModal);
+exportFunction(insertLinkModal);
+exportFunction(insertCustomTableModal);
+exportFunction(formatTextModal);
+exportFunction(toggleTableDropdownModal);
 
 // ============================================
 // CRUD Operations - Plans
