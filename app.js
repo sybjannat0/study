@@ -1295,6 +1295,9 @@ function closeModal(modalId) {
         if (playerContainer) {
             playerContainer.innerHTML = '';
         }
+        
+        // Navigate to videos tab after closing video player
+        switchTab('videos');
     }
     
     // Re-enable body scroll and remove classes when closing viewer modals

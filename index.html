@@ -710,17 +710,19 @@
                 <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
               </div>
               <div class="controls-row">
-                <div class="controls-left">
+                <div class="controls-center">
+                  <button class="control-btn" id="rewindBtn" title="Rewind 5s">
+                    <i data-lucide="skip-back"></i>
+                  </button>
                   <button class="control-btn" id="playPauseBtn" title="Play">
                     <i data-lucide="play" class="play-icon"></i>
                     <i data-lucide="pause" class="pause-icon" style="display: none;"></i>
                   </button>
-                  <button class="control-btn" id="rewindBtn" title="Rewind 5s">
-                    <i data-lucide="skip-back"></i>
-                  </button>
                   <button class="control-btn" id="forwardBtn" title="Forward 5s">
                     <i data-lucide="skip-forward"></i>
                   </button>
+                </div>
+                <div class="controls-left">
                   <div class="volume-control">
                     <button class="control-btn" id="volumeBtn" title="Volume">
                       <i data-lucide="volume-2"></i>
