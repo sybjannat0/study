@@ -182,65 +182,116 @@
       </section>
 
       <!-- Planning Tab -->
-      <section class="tab-content hidden" id="planningTab">
-        <div class="tab-page-header">
-          <h2><i data-lucide="calendar"></i> Planning</h2>
+      <section class="tab-content hidden planning-tab" id="planningTab">
+        <!-- Modern Hero Section with Stats -->
+        <div class="section-hero gradient-4">
+          <div class="hero-background">
+            <div class="hero-pattern"></div>
+            <div class="floating-shapes">
+              <div class="shape shape-1"></div>
+              <div class="shape shape-2"></div>
+              <div class="shape shape-3"></div>
+              <div class="shape shape-4"></div>
+            </div>
+          </div>
+          <div class="hero-main">
+            <div class="hero-info">
+              <div class="hero-icon">
+                <i data-lucide="calendar"></i>
+              </div>
+              <div class="hero-text">
+                <h1>Planning</h1>
+                <p>Organize your schedule</p>
+              </div>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-box">
+                <span class="stat-number" id="plansCount">0</span>
+                <span class="stat-label">Plans</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-number" id="remindersCount">0</span>
+                <span class="stat-label">Reminders</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-number" id="todosCount">0</span>
+                <span class="stat-label">To-Dos</span>
+              </div>
+            </div>
+            <div class="hero-actions">
+              <button class="action-btn primary" id="planningAddBtn">
+                <i data-lucide="plus"></i> Add Plan
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- Sub-tabs -->
-        <div class="sub-tabs">
-          <button class="sub-tab active" data-subtab="calendar">
-            <i data-lucide="calendar-days"></i> Calendar
+        <!-- Modern Sub-tabs -->
+        <div class="modern-sub-tabs">
+          <button class="modern-sub-tab active" data-subtab="calendar">
+            <i data-lucide="calendar-days"></i>
+            <span>Calendar</span>
           </button>
-          <button class="sub-tab" data-subtab="reminders">
-            <i data-lucide="bell"></i> Reminders
+          <button class="modern-sub-tab" data-subtab="reminders">
+            <i data-lucide="bell"></i>
+            <span>Reminders</span>
           </button>
-          <button class="sub-tab" data-subtab="todos">
-            <i data-lucide="list-todo"></i> To-Dos
+          <button class="modern-sub-tab" data-subtab="todos">
+            <i data-lucide="list-todo"></i>
+            <span>To-Dos</span>
           </button>
         </div>
 
         <!-- Calendar View -->
         <div class="sub-tab-content" id="calendarView">
-          <div class="calendar-header">
-            <button class="calendar-nav" id="prevMonth">
-              <i data-lucide="chevron-left"></i>
-            </button>
-            <h3 id="currentMonth">March 2026</h3>
-            <button class="calendar-nav" id="nextMonth">
-              <i data-lucide="chevron-right"></i>
-            </button>
+          <div class="planning-card">
+            <div class="calendar-header-modern">
+              <button class="calendar-nav-modern" id="prevMonth">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <h3 id="currentMonth">March 2026</h3>
+              <button class="calendar-nav-modern" id="nextMonth">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+            <div class="calendar-grid-modern" id="calendarGrid"></div>
           </div>
-          <div class="calendar-grid" id="calendarGrid"></div>
-          <button class="add-btn primary-btn" id="addPlanBtn">
-            <i data-lucide="plus"></i> Add Plan
-          </button>
         </div>
 
         <!-- Reminders View -->
         <div class="sub-tab-content hidden" id="remindersView">
-          <div class="list-container" id="remindersList">
-            <div class="empty-state">
-              <i data-lucide="bell-off"></i>
-              <p>No reminders</p>
+          <div class="planning-card">
+            <div class="card-header">
+              <h3><i data-lucide="bell"></i> Reminders</h3>
+              <button class="add-btn-small" id="addReminderBtn">
+                <i data-lucide="plus"></i>
+              </button>
+            </div>
+            <div class="list-container-modern" id="remindersList">
+              <div class="empty-state">
+                <i data-lucide="bell-off"></i>
+                <p>No reminders</p>
+              </div>
             </div>
           </div>
-          <button class="add-btn primary-btn" id="addReminderBtn">
-            <i data-lucide="plus"></i> Add Reminder
-          </button>
         </div>
 
         <!-- Todos View -->
         <div class="sub-tab-content hidden" id="todosView">
-          <div class="list-container" id="todosList">
-            <div class="empty-state">
-              <i data-lucide="list-checks"></i>
-              <p>No to-dos</p>
+          <div class="planning-card">
+            <div class="card-header">
+              <h3><i data-lucide="list-todo"></i> To-Dos</h3>
+              <button class="add-btn-small" id="addTodoBtn">
+                <i data-lucide="plus"></i>
+              </button>
+            </div>
+            <div class="list-container-modern" id="todosList">
+              <div class="empty-state">
+                <i data-lucide="list-checks"></i>
+                <p>No to-dos</p>
+              </div>
             </div>
           </div>
-          <button class="add-btn primary-btn" id="addTodoBtn">
-            <i data-lucide="plus"></i> Add To-Do
-          </button>
         </div>
       </section>
 
@@ -490,10 +541,6 @@
         <i data-lucide="home"></i>
         <span>Home</span>
       </button>
-      <button class="nav-item" data-tab="planning" onclick="switchTab('planning')">
-        <i data-lucide="calendar"></i>
-        <span>Planning</span>
-      </button>
       <button class="nav-item" data-tab="notes" onclick="switchTab('notes')">
         <i data-lucide="file-text"></i>
         <span>Notes</span>
@@ -572,6 +619,39 @@
         <div class="form-group">
           <label>Video URL</label>
           <input type="text" id="videoUrl" class="input-field" placeholder="https://...">
+        </div>
+        <button type="submit" class="btn primary submit-btn">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reel Modal -->
+  <div class="modal hidden" id="reelModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3 id="reelModalTitle">Add Reel</h3>
+        <button class="close-btn" onclick="closeModal('reelModal')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="reelForm">
+        <input type="hidden" id="reelId">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="reelTitle" required class="input-field">
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="reelSubject" class="input-field"></select>
+        </div>
+        <div class="form-group">
+          <label>YouTube URL</label>
+          <input type="text" id="reelUrl" class="input-field"
+            placeholder="https://youtube.com/watch?v=... or https://youtu.be/...">
+        </div>
+        <div class="form-group">
+          <label>Duration (optional, e.g. 1:30)</label>
+          <input type="text" id="reelDuration" class="input-field" placeholder="0:00 - 0:59">
         </div>
         <button type="submit" class="btn primary submit-btn">Save</button>
       </form>

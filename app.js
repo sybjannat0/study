@@ -61,6 +61,7 @@ let appState = {
     subjects: [],
     notes: [],
     videos: [],
+    reels: [],
     plans: [],
     reminders: [],
     todos: [],
@@ -415,6 +416,7 @@ async function loadData() {
         appState.subjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBJECTS)) || defaultSubjects;
         appState.notes = JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTES)) || [];
         appState.videos = JSON.parse(localStorage.getItem(STORAGE_KEYS.VIDEOS)) || [];
+        appState.reels = JSON.parse(localStorage.getItem('appReels')) || [];
         appState.plans = JSON.parse(localStorage.getItem(STORAGE_KEYS.PLANS)) || [];
         appState.reminders = JSON.parse(localStorage.getItem(STORAGE_KEYS.REMINDERS)) || [];
         appState.todos = JSON.parse(localStorage.getItem(STORAGE_KEYS.TODOS)) || [];
@@ -439,6 +441,7 @@ async function saveData() {
         localStorage.setItem(STORAGE_KEYS.SUBJECTS, JSON.stringify(appState.subjects));
         localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(appState.notes));
         localStorage.setItem(STORAGE_KEYS.VIDEOS, JSON.stringify(appState.videos));
+        localStorage.setItem('appReels', JSON.stringify(appState.reels));
         localStorage.setItem(STORAGE_KEYS.PLANS, JSON.stringify(appState.plans));
         localStorage.setItem(STORAGE_KEYS.REMINDERS, JSON.stringify(appState.reminders));
         localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(appState.todos));
@@ -546,6 +549,18 @@ function setupEventListeners() {
     if (planForm) planForm.addEventListener('submit', handlePlanSubmit);
     const addPlanBtn = document.getElementById('addPlanBtn');
     if (addPlanBtn) addPlanBtn.addEventListener('click', () => openModal('planModal'));
+    
+    // New planning add button in hero
+    const planningAddBtn = document.getElementById('planningAddBtn');
+    if (planningAddBtn) planningAddBtn.addEventListener('click', () => openModal('planModal'));
+    
+    // Add Reel button
+    const addReelBtn = document.getElementById('addReelBtn');
+    if (addReelBtn) addReelBtn.addEventListener('click', () => openModal('reelModal'));
+    
+    // Reel Modal
+    const reelForm = document.getElementById('reelForm');
+    if (reelForm) reelForm.addEventListener('submit', handleReelSubmit);
 
     // Reminder Modal
     const reminderForm = document.getElementById('reminderForm');
@@ -598,6 +613,12 @@ function setupEventListeners() {
     if (videosSubjectFilter) videosSubjectFilter.addEventListener('change', filterVideos);
     const videosSort = document.getElementById('videosSort');
     if (videosSort) videosSort.addEventListener('change', filterVideos);
+    
+    // Reels search and filter
+    const reelsSearch = document.getElementById('reelsSearch');
+    if (reelsSearch) reelsSearch.addEventListener('input', filterReels);
+    const reelsSubjectFilter = document.getElementById('reelsSubjectFilter');
+    if (reelsSubjectFilter) reelsSubjectFilter.addEventListener('change', filterReels);
 
     // Admin PIN System
     const ADMIN_PIN = '179084';
@@ -888,6 +909,7 @@ function showTab(tabName) {
     } else if (tabName === 'notes') {
         renderNotes();
         renderSubjects();
+        populateSubjectSelects();
         // Update stats in notes tab hero
         const notesCount = document.querySelector('#notesTab #notesCount');
         if (notesCount) {
@@ -900,6 +922,7 @@ function showTab(tabName) {
         }
     } else if (tabName === 'videos') {
         renderVideos();
+        populateSubjectSelects();
         // Update stats in videos tab hero
         const videosCount = document.querySelector('#videosTab #videosCount');
         if (videosCount) {
@@ -909,6 +932,21 @@ function showTab(tabName) {
         renderCalendar();
         renderReminders();
         renderTodos();
+        populateSubjectSelects();
+        // Update stats in planning tab hero
+        const plansCount = document.querySelector('#planningTab #plansCount');
+        if (plansCount) {
+            const plans = document.querySelectorAll('#calendarGrid .calendar-day.has-plan');
+            plansCount.textContent = plans.length || appState.plans?.length || 0;
+        }
+        const remindersCount = document.querySelector('#planningTab #remindersCount');
+        if (remindersCount) {
+            remindersCount.textContent = appState.reminders?.length || 0;
+        }
+        const todosCount = document.querySelector('#planningTab #todosCount');
+        if (todosCount) {
+            todosCount.textContent = appState.todos?.length || 0;
+        }
     } else if (tabName === 'settings') {
         populateSubjectSelects();
     }
@@ -935,7 +973,7 @@ window.showTab = showTab;
 // Sub-tabs (Planning)
 // ============================================
 function setupSubTabs() {
-    const subTabs = document.querySelectorAll('.sub-tab');
+    const subTabs = document.querySelectorAll('.modern-sub-tab');
     subTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const subTab = tab.dataset.subtab;
@@ -1269,6 +1307,114 @@ function renderNotes() {
     }
 }
 
+function renderReels() {
+    const container = document.getElementById('reelsGrid');
+    if (!container) return;
+    
+    const searchTerm = document.getElementById('reelsSearch')?.value?.toLowerCase() || '';
+    const subjectFilter = document.getElementById('reelsSubjectFilter')?.value || '';
+    
+    let filteredReels = appState.reels.filter(reel => {
+        const matchesSearch = reel.title.toLowerCase().includes(searchTerm);
+        const matchesSubject = !subjectFilter || reel.subjectId === subjectFilter;
+        return matchesSearch && matchesSubject;
+    });
+    
+    if (filteredReels.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i data-lucide="video"></i>
+                <p>No reels yet</p>
+                <span>Add your first reel to get started</span>
+            </div>
+        `;
+    } else {
+        container.innerHTML = filteredReels.map(reel => {
+            const subjectName = getSubjectName(reel.subjectId);
+            const subjectColor = getSubjectColor(reel.subjectId);
+            
+            // Extract YouTube video ID
+            let youtubeId = '';
+            if (reel.videoUrl) {
+                const match = reel.videoUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                youtubeId = match ? match[1] : '';
+            }
+            
+            const thumbnailUrl = youtubeId 
+                ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+                : '';
+            
+            return `
+                <div class="reel-card" onclick="playReel('${reel.id}')">
+                    <div class="reel-thumbnail">
+                        ${thumbnailUrl ? `<img src="${thumbnailUrl}" alt="${escapeHtml(reel.title)}">` : ''}
+                        <div class="reel-play-overlay">
+                            <i data-lucide="play"></i>
+                        </div>
+                        ${reel.duration ? `<span class="reel-duration">${reel.duration}</span>` : ''}
+                    </div>
+                    <div class="reel-info">
+                        <h4 class="reel-title">${escapeHtml(reel.title)}</h4>
+                        <div class="reel-meta">
+                            <div class="reel-subject">
+                                <span class="reel-subject-dot" style="background: ${subjectColor.split(' ')[2]}"></span>
+                                <span>${subjectName}</span>
+                            </div>
+                            <div class="reel-views">
+                                <i data-lucide="eye"></i>
+                                <span>${reel.views || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Re-initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 100);
+    }
+}
+
+// Play reel function
+function playReel(reelId) {
+    const reel = appState.reels.find(r => r.id === reelId);
+    if (!reel) return;
+    
+    // Update view count
+    reel.views = (reel.views || 0) + 1;
+    saveData();
+    
+    // Open video player modal
+    if (reel.videoUrl) {
+        // Find the video by URL or create a temporary reference
+        const video = appState.videos.find(v => v.videoUrl === reel.videoUrl);
+        if (video) {
+            openVideoPlayer(video.id);
+        } else {
+            // If no matching video, open video player and set URL manually
+            openModal('videoPlayerModal');
+            const playerContainer = document.getElementById('videoPlayerContainer');
+            const customPlayer = document.getElementById('customVideoPlayer');
+            const youtubeEmbed = document.getElementById('youtubeEmbed');
+            
+            // Extract YouTube ID
+            let youtubeId = '';
+            const match = reel.videoUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+            youtubeId = match ? match[1] : '';
+            
+            if (youtubeId && youtubeEmbed && customPlayer) {
+                customPlayer.style.display = 'none';
+                youtubeEmbed.style.display = 'block';
+                youtubeEmbed.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
+            }
+            
+            document.getElementById('videoPlayerTitle').textContent = reel.title;
+        }
+    }
+}
+
 function renderVideos() {
     const container = document.getElementById('videosGrid');
     if (!container) return;
@@ -1550,7 +1696,7 @@ function openModal(modalId) {
     }
     
     // Hide navigation for note and video modals too
-    if (modalId === 'noteModal' || modalId === 'videoModal') {
+    if (modalId === 'noteModal' || modalId === 'videoModal' || modalId === 'reelModal') {
         const bottomNav = document.querySelector('.bottom-nav');
         if (bottomNav) bottomNav.style.display = 'none';
     }
@@ -1623,7 +1769,7 @@ function closeModal(modalId) {
     }
     
     // Show navigation when closing note or video modal
-    if (modalId === 'noteModal' || modalId === 'videoModal') {
+    if (modalId === 'noteModal' || modalId === 'videoModal' || modalId === 'reelModal') {
         const bottomNav = document.querySelector('.bottom-nav');
         if (bottomNav) bottomNav.style.display = '';
     }
@@ -1792,6 +1938,52 @@ function editVideo(id) {
     
     document.getElementById('videoModalTitle').textContent = 'Edit Video';
     openModal('videoModal');
+}
+
+// Reel Functions
+function handleReelSubmit(e) {
+    e.preventDefault();
+    
+    const reelId = document.getElementById('reelId').value;
+    const reelData = {
+        id: reelId || generateId(),
+        title: document.getElementById('reelTitle').value,
+        subjectId: document.getElementById('reelSubject').value,
+        videoUrl: document.getElementById('reelUrl').value,
+        duration: document.getElementById('reelDuration').value,
+        views: reelId ? appState.reels.find(r => r.id === reelId)?.views || 0 : 0,
+        date: reelId ? appState.reels.find(r => r.id === reelId)?.date : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    if (reelId) {
+        const index = appState.reels.findIndex(r => r.id === reelId);
+        if (index !== -1) appState.reels[index] = reelData;
+        showToast('Reel updated', 'success');
+    } else {
+        appState.reels.push(reelData);
+        showToast('Reel added', 'success');
+    }
+    
+    saveData();
+    showTab('reels');
+    closeModal('reelModal');
+    document.getElementById('reelForm').reset();
+    document.getElementById('reelId').value = '';
+}
+
+function editReel(id) {
+    const reel = appState.reels.find(r => r.id === id);
+    if (!reel) return;
+    
+    document.getElementById('reelId').value = reel.id;
+    document.getElementById('reelTitle').value = reel.title;
+    document.getElementById('reelSubject').value = reel.subjectId;
+    document.getElementById('reelUrl').value = reel.videoUrl || '';
+    document.getElementById('reelDuration').value = reel.duration || '';
+    
+    document.getElementById('reelModalTitle').textContent = 'Edit Reel';
+    openModal('reelModal');
 }
 
 function deleteVideo(id) {
@@ -2356,6 +2548,7 @@ function formatTime(seconds) {
 
 window.openVideoPlayer = openVideoPlayer;
 window.openNoteModal = openNoteModal;
+window.playReel = playReel;
 window.openVideoModal = openVideoModal;
 
 // ============================================
@@ -2560,7 +2753,7 @@ function deleteSubject(id) {
 // Helper Functions
 // ============================================
 function populateSubjectSelects() {
-    const selects = ['noteSubject', 'videoSubject', 'planSubject', 'notesSubjectFilter', 'videosSubjectFilter'];
+    const selects = ['noteSubject', 'videoSubject', 'reelSubject', 'planSubject', 'notesSubjectFilter', 'videosSubjectFilter', 'reelsSubjectFilter'];
     
     selects.forEach(selectId => {
         const select = document.getElementById(selectId);
@@ -2938,6 +3131,17 @@ function filterVideos() {
         clearBtn.style.display = searchTerm ? 'flex' : 'none';
     }
     renderVideos();
+}
+
+function filterReels() {
+    // Show/hide clear button
+    const searchInput = document.getElementById('reelsSearch');
+    const searchTerm = searchInput?.value?.toLowerCase() || '';
+    const clearBtn = searchInput?.closest('.search-box')?.querySelector('.search-clear');
+    if (clearBtn) {
+        clearBtn.style.display = searchTerm ? 'flex' : 'none';
+    }
+    renderReels();
 }
 
 // View toggle functions
