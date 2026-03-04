@@ -4553,8 +4553,8 @@ h6.bengali-text {
     padding: 8px 16px;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent) !important;
     opacity: 0;
-    transition: opacity 0.5s ease;
     pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 :fullscreen .viewer-header.auto-hide,
@@ -4563,10 +4563,14 @@ h6.bengali-text {
     pointer-events: none;
 }
 
+:fullscreen .viewer-header .viewer-actions,
+:-webkit-full-screen .viewer-header .viewer-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 :fullscreen .viewer-header:hover,
-:-webkit-full-screen .viewer-header:hover,
-:fullscreen #videoPlayerModal:hover .viewer-header,
-:-webkit-full-screen #videoPlayerModal:hover .viewer-header {
+:-webkit-full-screen .viewer-header:hover {
     opacity: 1;
     pointer-events: auto;
 }

@@ -1785,6 +1785,41 @@ function initYouTubeControls() {
                 controls.style.pointerEvents = 'none';
             }
         }, 2000);
+        
+        // Add click handler to video container to show controls temporarily
+        const videoContent = document.querySelector('.video-viewer-content');
+        if (videoContent) {
+            videoContent.onclick = (e) => {
+                // Don't trigger if clicking on controls
+                if (e.target.closest('.custom-controls') || e.target.closest('.viewer-header')) return;
+                
+                // Show controls
+                if (header) {
+                    header.classList.remove('auto-hide');
+                    header.style.opacity = '1';
+                    header.style.pointerEvents = 'auto';
+                }
+                if (controls) {
+                    controls.classList.remove('auto-hide');
+                    controls.style.opacity = '1';
+                    controls.style.pointerEvents = 'auto';
+                }
+                
+                // Hide again after 2 seconds
+                setTimeout(() => {
+                    if (header && document.fullscreenElement) {
+                        header.classList.add('auto-hide');
+                        header.style.opacity = '0';
+                        header.style.pointerEvents = 'none';
+                    }
+                    if (controls && document.fullscreenElement) {
+                        controls.classList.add('auto-hide');
+                        controls.style.opacity = '0';
+                        controls.style.pointerEvents = 'none';
+                    }
+                }, 2000);
+            };
+        }
     };
     
     // Update progress bar
@@ -1958,6 +1993,41 @@ function initNativeVideoControls() {
                 controls.style.pointerEvents = 'none';
             }
         }, 2000);
+        
+        // Add click handler to video container to show controls temporarily
+        const videoContent = document.querySelector('.video-viewer-content');
+        if (videoContent) {
+            videoContent.onclick = (e) => {
+                // Don't trigger if clicking on controls
+                if (e.target.closest('.custom-controls') || e.target.closest('.viewer-header')) return;
+                
+                // Show controls
+                if (header) {
+                    header.classList.remove('auto-hide');
+                    header.style.opacity = '1';
+                    header.style.pointerEvents = 'auto';
+                }
+                if (controls) {
+                    controls.classList.remove('auto-hide');
+                    controls.style.opacity = '1';
+                    controls.style.pointerEvents = 'auto';
+                }
+                
+                // Hide again after 2 seconds
+                setTimeout(() => {
+                    if (header && document.fullscreenElement) {
+                        header.classList.add('auto-hide');
+                        header.style.opacity = '0';
+                        header.style.pointerEvents = 'none';
+                    }
+                    if (controls && document.fullscreenElement) {
+                        controls.classList.add('auto-hide');
+                        controls.style.opacity = '0';
+                        controls.style.pointerEvents = 'none';
+                    }
+                }, 2000);
+            };
+        }
     };
     
     lucide.createIcons();
