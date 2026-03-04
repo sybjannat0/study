@@ -353,7 +353,7 @@
               </div>
             </div>
             <div class="hero-actions">
-              <button class="btn primary" onclick="openNoteModal()">
+              <button class="btn primary" id="addNoteBtn" onclick="openNoteModal()">
                 <i data-lucide="plus"></i> Add Note
               </button>
             </div>
@@ -416,7 +416,7 @@
               </div>
             </div>
             <div class="hero-actions">
-              <button class="btn primary" onclick="openVideoModal()">
+              <button class="btn primary" id="addVideoBtn" onclick="openVideoModal()">
                 <i data-lucide="plus"></i> Add Video
               </button>
             </div>
@@ -500,7 +500,8 @@
               <span class="status-badge active">
                 <i data-lucide="check-circle"></i> Admin Mode Active
               </span>
-              <button id="lockAdminBtn" class="lock-again-btn" onclick="lockAdminPanel()">
+              <button id="lockAdminBtn" class="lock-again-btn"
+                onclick="if(window.lockAdminPanel){window.lockAdminPanel();}else{console.log('lockAdminPanel not defined')}">
                 <i data-lucide="lock"></i> Lock
               </button>
             </div>

@@ -5182,6 +5182,7 @@ body::before {
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
     flex-shrink: 0;
+    transition: opacity 0.5s ease, pointer-events 0.5s ease;
 }
 
 .viewer-header.video-header {

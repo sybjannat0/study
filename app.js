@@ -512,15 +512,24 @@ function toggleAdminElements(forceAdmin) {
     
     if (addNoteBtn) {
         addNoteBtn.style.display = isAdmin ? 'flex' : 'none';
+        console.log('addNoteBtn display set to:', addNoteBtn.style.display);
+    } else {
+        console.log('addNoteBtn not found in DOM');
     }
     if (addVideoBtn) {
         addVideoBtn.style.display = isAdmin ? 'flex' : 'none';
+        console.log('addVideoBtn display set to:', addVideoBtn.style.display);
+    } else {
+        console.log('addVideoBtn not found in DOM');
     }
     
     // Hide/Show Add button for Essays
     const addEssayBtn = document.getElementById('addEssayBtn');
     if (addEssayBtn) {
         addEssayBtn.style.display = isAdmin ? 'flex' : 'none';
+        console.log('addEssayBtn display set to:', addEssayBtn.style.display);
+    } else {
+        console.log('addEssayBtn not found in DOM');
     }
     
     // Hide/Show Settings sections (except admin section which is always visible)
@@ -662,17 +671,29 @@ function setupEventListeners() {
     const unlockAdminBtn = document.getElementById('unlockAdminBtn');
     const lockAdminBtn = document.getElementById('lockAdminBtn');
     const pinError = document.getElementById('pinError');
-
+    const adminIdInput = null; // Not used in current design
+    
+    // Declare lockAdminPanel first, then export it
+    window.lockAdminPanel = null;
+    
+    console.log('lockAdminBtn element:', lockAdminBtn);
+    
     // Expose function globally - verifyAdminPin must query admin_pin from Supabase
     window.verifyAdminPin = async function() {
         console.log('verifyAdminPin called');
         if (!adminPinInput) {
             console.error('adminPinInput element not found');
+            showToast('Error: PIN input not found', 'error');
             return;
         }
         const pin = adminPinInput.value.trim();
         
         console.log('Verifying admin PIN:', pin);
+        
+        if (!pin) {
+            showToast('Please enter a PIN', 'error');
+            return;
+        }
         
         // Verify PIN against Supabase
         if (!supabaseClient) {
@@ -791,10 +812,14 @@ function setupEventListeners() {
     }
 
     if (lockAdminBtn) {
+        console.log('Attaching click listener to lockAdminBtn');
         lockAdminBtn.addEventListener('click', lockAdminPanel);
+    } else {
+        console.log('lockAdminBtn not found in DOM');
     }
 
     function lockAdminPanel() {
+        console.log('lockAdminPanel called');
         isAdminUnlocked = false;
         sessionStorage.removeItem('adminUnlocked');
         appState.settings.adminMode = false;
@@ -808,12 +833,18 @@ function setupEventListeners() {
     
     // Export function globally
     window.lockAdminPanel = lockAdminPanel;
+    console.log('Exported lockAdminPanel to window');
 
     function showAdminPanel() {
+        console.log('showAdminPanel called');
         const lockScreen = document.getElementById('adminLockScreen');
         const adminPanel = document.getElementById('adminPanel');
-        if (lockScreen) lockScreen.style.display = 'none';
-        if (adminPanel) adminPanel.style.display = 'block';
+        if (lockScreen) {
+            lockScreen.style.display = 'none';
+        }
+        if (adminPanel) {
+            adminPanel.style.display = 'block';
+        }
         // Show settings sections when admin is unlocked
         const settingsSections = document.querySelectorAll('.settings-section');
         settingsSections.forEach(section => {
@@ -833,11 +864,14 @@ function setupEventListeners() {
         const lockScreen = document.getElementById('adminLockScreen');
         const adminPanel = document.getElementById('adminPanel');
         console.log('lockScreen element:', lockScreen);
+        console.log('adminPanel element:', adminPanel);
         if (lockScreen) {
             lockScreen.style.display = 'flex';
             console.log('Set lockScreen display to flex');
         }
-        if (adminPanel) adminPanel.style.display = 'none';
+        if (adminPanel) {
+            adminPanel.style.display = 'none';
+        }
         if (adminPinInput) adminPinInput.value = '';
         if (adminIdInput) adminIdInput.value = '';
         // Hide other settings sections when admin is locked
@@ -862,6 +896,8 @@ function setupEventListeners() {
         showAdminPanel();
     } else {
         showAdminLockScreen();
+        // Also call toggleAdminElements to hide buttons initially
+        toggleAdminElements(false);
     }
 }
 
@@ -3008,9 +3044,9 @@ function openVideoPlayer(id) {
                             videoId: videoId,
                             playerVars: {
                                 'autoplay': 1,
-                                'controls': 1,
+                                'controls': 0,
                                 'disablekb': 1,
-                                'fs': 0,
+                                'fs': 1,
                                 'modestbranding': 1,
                                 'rel': 0,
                                 'showinfo': 0,
@@ -3044,7 +3080,8 @@ function openVideoPlayer(id) {
                 // Hide custom controls since YouTube native controls are enabled
                 const customControls = document.getElementById('customControls');
                 if (customControls) {
-                    customControls.style.display = 'none';
+                    customControls.style.display = 'flex';
+                    customControls.style.opacity = '1';
                 }
                 
                 // Re-initialize Lucide icons
@@ -3053,6 +3090,9 @@ function openVideoPlayer(id) {
                         lucide.createIcons();
                     }
                 }, 100);
+                
+                // Auto-hide video header after 2 seconds for fresh look
+                setupVideoHeaderAutoHide();
                 
                 return;
             }
@@ -3070,6 +3110,10 @@ function openVideoPlayer(id) {
             }
             playerContainer.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen playsinline></iframe>`;
             openModal('videoPlayerModal');
+            
+            // Auto-hide video header after 2 seconds for fresh look
+            setupVideoHeaderAutoHide();
+            
             return;
         }
         
@@ -3086,6 +3130,9 @@ function openVideoPlayer(id) {
             customControls.style.display = 'flex';
             customControls.style.opacity = '1';
         }
+        
+        // Auto-hide video header after 2 seconds for fresh look
+        setupVideoHeaderAutoHide();
         
         openModal('videoPlayerModal');
     } else {
@@ -3302,6 +3349,59 @@ function initYouTubeControls() {
     console.log('YouTube controls initialized');
 }
 
+// Auto-hide video header after 2 seconds for fresh look
+let videoHeaderHideTimer = null;
+let videoPlayerModal = null;
+
+function setupVideoHeaderAutoHide() {
+    // Get modal element
+    videoPlayerModal = document.getElementById('videoPlayerModal');
+    
+    // Clear any existing timer
+    if (videoHeaderHideTimer) {
+        clearTimeout(videoHeaderHideTimer);
+    }
+    
+    // Get the video header element
+    const videoHeader = document.querySelector('.video-header');
+    if (!videoHeader) return;
+    
+    // Show header first
+    videoHeader.style.opacity = '1';
+    videoHeader.style.pointerEvents = 'auto';
+    
+    // Set timer to hide header after 2 seconds
+    videoHeaderHideTimer = setTimeout(() => {
+        if (videoHeader) {
+            videoHeader.style.opacity = '0';
+            videoHeader.style.pointerEvents = 'none';
+        }
+    }, 2000);
+    
+    // Show header on mouse move
+    if (videoPlayerModal) {
+        videoPlayerModal.onmousemove = function() {
+            if (videoHeader) {
+                videoHeader.style.opacity = '1';
+                videoHeader.style.pointerEvents = 'auto';
+            }
+            
+            // Reset the timer
+            if (videoHeaderHideTimer) {
+                clearTimeout(videoHeaderHideTimer);
+            }
+            
+            // Set timer to hide again after 2 seconds of inactivity
+            videoHeaderHideTimer = setTimeout(() => {
+                if (videoHeader) {
+                    videoHeader.style.opacity = '0';
+                    videoHeader.style.pointerEvents = 'none';
+                }
+            }, 2000);
+        };
+    }
+}
+
 // Update YouTube Progress
 function updateYouTubeProgress() {
     if (!youtubePlayer || !playerReady) return;
@@ -3501,6 +3601,7 @@ function formatTime(seconds) {
 }
 
 window.openVideoPlayer = openVideoPlayer;
+window.setupVideoHeaderAutoHide = setupVideoHeaderAutoHide;
 window.openNoteModal = openNoteModal;
 window.playReel = playReel;
 window.openVideoModal = openVideoModal;
