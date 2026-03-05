@@ -264,15 +264,20 @@ function initPullToRefresh() {
 async function performRefresh() {
     // Refresh all data
     try {
-        // Reload data from Supabase
-        await loadEssays();
-        await loadSubjects();
-        await loadNotes();
-        await loadVideos();
-        await loadPlans();
-        await loadReminders();
-        await loadTodos();
-        await loadReels();
+        // Reload data from Supabase/localStorage
+        await loadData();
+        
+        // Re-render all UI components
+        if (typeof renderEssays === 'function') renderEssays();
+        if (typeof renderSubjects === 'function') renderSubjects();
+        if (typeof renderNotes === 'function') renderNotes();
+        if (typeof renderVideos === 'function') renderVideos();
+        if (typeof renderPlans === 'function') renderPlans();
+        if (typeof renderReminders === 'function') renderReminders();
+        if (typeof renderTodos === 'function') renderTodos();
+        if (typeof renderReels === 'function') renderReels();
+        if (typeof renderStats === 'function') renderStats();
+        if (typeof renderDashboard === 'function') renderDashboard();
         
         // Show success feedback
         showToast('Data refreshed', 'success');
