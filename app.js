@@ -1944,6 +1944,9 @@ function openEssayModal() {
         modal.classList.add('active');
         document.body.classList.add('essay-modal-open');
         
+        // Prevent page scroll when modal is open on mobile
+        document.body.style.overflow = 'hidden';
+        
         document.getElementById('essayModalTitle').value = '';
         document.getElementById('essayModalEditor').innerHTML = '';
         document.getElementById('wordCountModal').textContent = '0';
@@ -1958,7 +1961,13 @@ function openEssayModal() {
             subjectSelect.value = '';
         }
         
-        document.getElementById('essayModalEditor').focus();
+        // Focus and scroll editor into view without shifting modal
+        setTimeout(() => {
+            const editor = document.getElementById('essayModalEditor');
+            if (editor) {
+                editor.focus();
+            }
+        }, 100);
         
         // Add event listener for stats
         const editor = document.getElementById('essayModalEditor');
@@ -2026,6 +2035,8 @@ function closeEssayModal() {
     if (modal) {
         modal.classList.remove('active');
         document.body.classList.remove('essay-modal-open');
+        // Restore body scroll
+        document.body.style.overflow = '';
         window.currentEssayId = null;
     }
 }
