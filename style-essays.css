@@ -14,15 +14,154 @@
     gap: 20px;
 }
 
+/* Responsive grid for mobile */
+@media (max-width: 600px) {
+    .essays-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 0 4px;
+    }
+    
+    .essay-card {
+        padding: 16px;
+    }
+    
+    .essay-card-title {
+        font-size: 16px;
+    }
+    
+    .essay-card-preview {
+        font-size: 13px;
+    }
+}
+
+/* Tablet */
+@media (min-width: 601px) and (max-width: 768px) {
+    .essays-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .essay-card {
+        padding: 10px;
+    }
+    
+    .essay-card-title {
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+    
+    .essay-card-preview {
+        font-size: 11px;
+        margin-bottom: 6px;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+    }
+    
+    .essay-card-footer {
+        padding-top: 6px;
+    }
+    
+    .essay-subject {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+    
+    .essay-card-actions {
+        margin-top: 6px;
+        padding-top: 6px;
+    }
+    
+    .essay-card-actions .btn {
+        font-size: 0.7rem;
+        padding: 4px 6px;
+    }
+    
+    .essay-card-date,
+    .essay-card-words {
+        font-size: 10px;
+    }
+}
+
+/* iPad Pro */
+@media (min-width: 1024px) and (max-width: 1366px) {
+    .essays-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .essay-card {
+        padding: 10px;
+    }
+    
+    .essay-card-title {
+        font-size: 14px;
+    }
+    
+    .essay-card-preview {
+        font-size: 11px;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+    }
+    
+    .essay-card-actions .btn {
+        font-size: 0.7rem;
+    }
+}
+
+/* Desktop and larger screens (above 768px) */
+@media (min-width: 769px) {
+    .essay-card {
+        padding: 10px;
+    }
+    
+    .essay-card-title {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    
+    .essay-card-preview {
+        font-size: 11px;
+        margin-bottom: 6px;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+    }
+    
+    .essay-card-footer {
+        padding-top: 6px;
+    }
+    
+    .essay-subject {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+    
+    .essay-card-actions {
+        margin-top: 6px;
+        padding-top: 6px;
+    }
+    
+    .essay-card-actions .btn {
+        font-size: 0.7rem;
+        padding: 4px 6px;
+    }
+    
+    .essay-card-date,
+    .essay-card-words {
+        font-size: 10px;
+    }
+}
+
 .essay-card {
     background: white;
     border-radius: 16px;
-    padding: 20px;
+    padding: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.05);
     margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .essay-card:hover {
@@ -62,20 +201,21 @@
 }
 
 .essay-card-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--text-primary, #1a1a1a);
-    margin: 0 0 10px 0;
+    margin: 0 0 6px 0;
     line-height: 1.4;
 }
 
 .essay-card-preview {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-secondary, #666);
-    margin: 0 0 16px 0;
-    line-height: 1.6;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -84,8 +224,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 12px;
+    padding-top: 8px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: auto;
 }
 
 .essay-card-date {
@@ -327,10 +468,28 @@ body.essay-modal-open .bottom-nav {
 
 /* Mobile responsive for essay modal */
 @media (max-width: 600px) {
+    .essay-modal-backdrop {
+        padding: 0;
+        align-items: flex-end;
+    }
+    
+    .essay-modal {
+        width: 100%;
+        max-width: 100%;
+        height: 95vh;
+        border-radius: 20px 20px 0 0;
+        max-height: 95vh;
+        /* Safe area support for iPhone notch */
+        padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    
     .essay-modal-header {
         flex-direction: column;
         gap: 12px;
         padding: 12px;
+        padding-top: max(12px, env(safe-area-inset-top, 0));
+        padding-left: max(12px, env(safe-area-inset-left, 0));
+        padding-right: max(12px, env(safe-area-inset-right, 0));
     }
     
     .essay-modal-header-content {
@@ -341,6 +500,7 @@ body.essay-modal-open .bottom-nav {
     
     .essay-modal-input-group {
         width: 100%;
+        padding: 10px 14px;
     }
     
     .essay-modal-title-input {
@@ -357,6 +517,198 @@ body.essay-modal-open .bottom-nav {
         right: 8px;
         width: 36px;
         height: 36px;
+    }
+    
+    .essay-toolbar-row {
+        padding: 8px 12px;
+        padding-left: max(12px, env(safe-area-inset-left, 0));
+        padding-right: max(12px, env(safe-area-inset-right, 0));
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .essay-toolbar {
+        gap: 2px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+    
+    .toolbar-btn {
+        width: 32px;
+        height: 32px;
+        padding: 6px;
+        flex-shrink: 0;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+    
+    .toolbar-btn i {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .toolbar-divider {
+        height: 20px;
+        margin: 0 4px;
+    }
+    
+    .essay-modal-editor {
+        padding: 16px;
+        font-size: 1rem;
+        line-height: 1.7;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .essay-modal-footer {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 16px;
+        padding-left: max(16px, env(safe-area-inset-left, 0));
+        padding-right: max(16px, env(safe-area-inset-right, 0));
+        padding-bottom: max(16px, env(safe-area-inset-bottom, 0));
+    }
+    
+    .essay-modal-stats {
+        font-size: 0.8rem;
+    }
+    
+    .essay-modal-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+    
+    .essay-modal-actions .btn {
+        flex: 1;
+        justify-content: center;
+        min-height: 44px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .essay-stats {
+        font-size: 0.8rem;
+    }
+    
+    .essay-read-modal {
+        height: 95vh;
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .essay-read-title {
+        font-size: 1.25rem;
+    }
+    
+    .essay-read-content {
+        padding: 16px;
+        font-size: 1rem;
+    }
+}
+
+/* iPad and Tablet (Portrait) */
+@media (min-width: 601px) and (max-width: 768px) {
+    .essay-modal {
+        max-width: 90%;
+        height: 85vh;
+    }
+    
+    .essay-modal-header {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+    }
+    
+    .essay-modal-header-content {
+        flex: 1;
+        min-width: 60%;
+    }
+    
+    .essay-toolbar-row {
+        padding: 10px 16px;
+    }
+    
+    .essay-modal-editor {
+        padding: 20px;
+        font-size: 1rem;
+    }
+    
+    .essay-modal-footer {
+        padding: 12px 20px;
+    }
+}
+
+/* iPad and Tablet (Landscape) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .essay-modal {
+        max-width: 85%;
+        height: 85vh;
+    }
+    
+    .essay-modal-header {
+        padding: 16px 24px;
+    }
+    
+    .essay-toolbar-row {
+        padding: 12px 24px;
+    }
+    
+    .essay-modal-editor {
+        padding: 24px;
+    }
+}
+
+/* Large Windows/Desktop */
+@media (min-width: 1200px) {
+    .essay-modal {
+        max-width: 1000px;
+    }
+    
+    .essay-modal-editor {
+        padding: 32px 48px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 400px) {
+    .essay-modal-input-group {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    
+    .essay-modal-title-input {
+        font-size: 0.9rem;
+    }
+    
+    .toolbar-btn {
+        width: 28px;
+        height: 28px;
+        padding: 4px;
+    }
+    
+    .toolbar-btn i {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .font-size-select {
+        width: 70px;
+        padding: 4px;
+        font-size: 0.75rem;
+    }
+    
+    .color-dropdown,
+    .table-dropdown {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: 20px 20px 0 0;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+    
+    .color-picker-container,
+    .table-picker-container {
+        position: static;
     }
 }
 
@@ -521,8 +873,8 @@ body.essay-modal-open .bottom-nav {
 
 /* Essay Card Actions */
 .essay-card-actions {
-    margin-top: 16px;
-    padding-top: 12px;
+    margin-top: 12px;
+    padding-top: 8px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
     gap: 8px;
@@ -534,6 +886,7 @@ body.essay-modal-open .bottom-nav {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    font-size: 0.85rem;
-    padding: 8px 12px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    min-height: auto;
 }

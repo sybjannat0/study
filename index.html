@@ -4,7 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="A personal study management application for notes, videos, essays, and more">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="StudyHub">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-TileColor" content="#6366f1">
+  <meta name="msapplication-tap-highlight" content="no">
   <title>Personal Study Hub</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%236366f1' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='white'%3E📚%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%236366f1' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='white'%3E📚%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="style-essays.css">
   <link rel="stylesheet" href="admin-styles.css">
@@ -1020,6 +1034,10 @@
           <button class="toolbar-btn" id="formatBtnAlignRight" onclick="formatTextModal('alignRight')"
             title="Align Right">
             <i data-lucide="align-right"></i>
+          </button>
+          <button class="toolbar-btn" id="formatBtnAlignJustify" onclick="formatTextModal('alignJustify')"
+            title="Justify">
+            <i data-lucide="align-justify"></i>
           </button>
           <span class="toolbar-divider"></span>
           <button class="toolbar-btn" id="formatBtnQuote" onclick="formatTextModal('quote')" title="Quote">

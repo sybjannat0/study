@@ -80,6 +80,34 @@ window.switchTab = function(tabName) {
 // ============================================
 // Initialization
 // ============================================
+// Service Worker Registration for PWA
+// ============================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then((registration) => {
+                console.log('ServiceWorker registered: ', registration.scope);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // New update available
+                            if (confirm('A new version is available. Reload to update?')) {
+                                window.location.reload();
+                            }
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.error('ServiceWorker registration failed: ', error);
+            });
+    });
+}
+
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
     // Check if user is already logged in
     const isLoggedIn = sessionStorage.getItem('appLoggedIn') === 'true';
@@ -1740,6 +1768,9 @@ function formatText(command, value = null) {
         case 'alignRight':
             document.execCommand('justifyRight', false, null);
             break;
+        case 'alignJustify':
+            document.execCommand('justifyFull', false, null);
+            break;
         case 'fontSize':
             // Use fontSize with value 1 (small), 3 (normal), 5 (large)
             const sizeMap = { 'small': '1', 'normal': '3', 'large': '5' };
@@ -1936,6 +1967,13 @@ function openEssayModal() {
         editor.addEventListener('keydown', updateToolbarStateModal);
         editor.addEventListener('mouseup', updateToolbarStateModal);
         editor.addEventListener('input', updateToolbarStateModal);
+        
+        // Handle paste to strip formatting - paste as plain text only
+        editor.onpaste = function(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        };
     }
 }
 
@@ -1972,6 +2010,13 @@ function openEssayModalWithId(id) {
         editor.addEventListener('keydown', updateToolbarStateModal);
         editor.addEventListener('mouseup', updateToolbarStateModal);
         editor.addEventListener('input', updateToolbarStateModal);
+        
+        // Handle paste to strip formatting - paste as plain text only
+        editor.onpaste = function(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        };
     }
 }
 
@@ -2283,6 +2328,9 @@ function formatTextModal(command, value = null) {
             break;
         case 'alignRight':
             document.execCommand('justifyRight', false, null);
+            break;
+        case 'alignJustify':
+            document.execCommand('justifyFull', false, null);
             break;
         case 'quote':
             // First focus the editor
@@ -3354,8 +3402,11 @@ let videoHeaderHideTimer = null;
 let videoPlayerModal = null;
 
 function setupVideoHeaderAutoHide() {
-    // Get modal element
-    videoPlayerModal = document.getElementById('videoPlayerModal');
+    // Get modal and container elements
+    const videoPlayerModal = document.getElementById('videoPlayerModal');
+    const videoContainer = document.getElementById('videoPlayerContainer');
+    const customControls = document.getElementById('customControls');
+    const customPlayer = document.getElementById('customVideoPlayer');
     
     // Clear any existing timer
     if (videoHeaderHideTimer) {
@@ -3378,28 +3429,79 @@ function setupVideoHeaderAutoHide() {
         }
     }, 2000);
     
-    // Show header on mouse move
+    // Show header on mouse move, but don't interfere with controls
     if (videoPlayerModal) {
-        videoPlayerModal.onmousemove = function() {
-            if (videoHeader) {
-                videoHeader.style.opacity = '1';
-                videoHeader.style.pointerEvents = 'auto';
+        // Use a more specific approach - track mouse on modal but not on controls
+        videoPlayerModal.addEventListener('mousemove', handleVideoMouseMove);
+    }
+    
+    // Add click handler to video container for play/pause toggle
+    // This ensures clicks on video area toggle play/pause
+    if (customPlayer) {
+        // Remove any existing click handler to avoid duplicates
+        customPlayer.onclick = function(e) {
+            // Don't toggle if clicking on the YouTube iframe (it handles its own) or controls
+            if (e.target.closest('iframe') || e.target.closest('.custom-controls') || e.target.closest('.viewer-header')) {
+                return;
             }
             
-            // Reset the timer
-            if (videoHeaderHideTimer) {
-                clearTimeout(videoHeaderHideTimer);
+            // Toggle play/pause for YouTube
+            if (youtubePlayer && playerReady) {
+                try {
+                    if (youtubePlayer.getPlayerState() === window.YT.PlayerState.PLAYING) {
+                        youtubePlayer.pauseVideo();
+                    } else {
+                        youtubePlayer.playVideo();
+                    }
+                } catch (e) {}
             }
             
-            // Set timer to hide again after 2 seconds of inactivity
-            videoHeaderHideTimer = setTimeout(() => {
-                if (videoHeader) {
-                    videoHeader.style.opacity = '0';
-                    videoHeader.style.pointerEvents = 'none';
+            // Toggle play/pause for native video
+            const nativeVideo = document.getElementById('videoPlayer');
+            if (nativeVideo && nativeVideo.style.display !== 'none') {
+                if (nativeVideo.paused) {
+                    nativeVideo.play();
+                } else {
+                    nativeVideo.pause();
                 }
-            }, 2000);
+            }
         };
     }
+}
+
+// Handle mouse movement for header auto-show
+function handleVideoMouseMove(e) {
+    const videoHeader = document.querySelector('.video-header');
+    const customControls = document.getElementById('customControls');
+    
+    // Don't show header if mouse is over controls
+    if (customControls && customControls.contains(e.target)) {
+        return;
+    }
+    
+    // Don't show header if mouse is over header itself
+    if (videoHeader && videoHeader.contains(e.target)) {
+        return;
+    }
+    
+    // Show header on mouse move
+    if (videoHeader) {
+        videoHeader.style.opacity = '1';
+        videoHeader.style.pointerEvents = 'auto';
+    }
+    
+    // Reset the timer
+    if (videoHeaderHideTimer) {
+        clearTimeout(videoHeaderHideTimer);
+    }
+    
+    // Set timer to hide again after 2 seconds of inactivity
+    videoHeaderHideTimer = setTimeout(() => {
+        if (videoHeader) {
+            videoHeader.style.opacity = '0';
+            videoHeader.style.pointerEvents = 'none';
+        }
+    }, 2000);
 }
 
 // Update YouTube Progress
