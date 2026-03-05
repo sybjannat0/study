@@ -2054,27 +2054,9 @@ function openReadEssayModal(id) {
         return;
     }
     
-    // Get subject info
-    const subject = appState.subjects.find(s => s.id === essay.subjectId);
-    const subjectColor = subject?.color || '#6366f1';
-    const subjectName = subject?.name || 'No Subject';
-    
-    // Format date
-    const dateObj = new Date(essay.date);
-    const formattedDate = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    
-    // Calculate word count
-    const textContent = essay.content ? essay.content.replace(/<[^>]*>/g, '') : '';
-    const wordCount = textContent.trim() ? textContent.trim().split(/\s+/).length : 0;
-    
     // Set content
     document.getElementById('readEssayTitle').textContent = essay.title || 'Untitled';
-    document.getElementById('readEssaySubject').textContent = subjectName;
-    document.getElementById('readEssaySubject').style.background = subjectColor + '20';
-    document.getElementById('readEssaySubject').style.color = subjectColor;
-    document.getElementById('readEssayDate').textContent = formattedDate;
     document.getElementById('readEssayContent').innerHTML = essay.content || '<p>No content</p>';
-    document.getElementById('readEssayWordCount').textContent = wordCount;
     
     // Show modal
     modal.classList.add('active');
