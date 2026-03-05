@@ -2799,6 +2799,53 @@ body::before {
    PWA & Touch Optimizations
    ============================================ */
 
+/* Pull to refresh indicator - base styles */
+.ptr-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.15) 0%, transparent 100%);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.ptr-indicator.visible {
+    opacity: 1;
+}
+
+.ptr-indicator svg {
+    width: 28px;
+    height: 28px;
+    color: var(--primary, #6366f1);
+    animation: ptrBounce 1s ease infinite;
+}
+
+@keyframes ptrBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.ptr-indicator.refreshing svg {
+    animation: ptrSpin 1s linear infinite;
+}
+
+@keyframes ptrSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Hide by default, show only in PWA mode */
+.ptr-indicator {
+    display: none;
+}
+
 /* PWA standalone mode */
 @media (display-mode: standalone) {
     .app-header {
@@ -2813,14 +2860,23 @@ body::before {
         overscroll-behavior: none;
     }
     
-    /* Prevent pull-to-refresh on mobile */
+    /* Prevent pull-to-refresh on mobile but allow custom pull to refresh */
     html, body {
         overscroll-behavior-y: contain;
+    }
+    
+    /* Pull to refresh indicator */
+    .ptr-indicator {
+        display: flex;
     }
 }
 
 /* PWA fullscreen mode */
 @media (display-mode: fullscreen) {
+    .ptr-indicator {
+        display: flex;
+    }
+    
     .app-header {
         padding-top: max(12px, env(safe-area-inset-top));
     }

@@ -108,7 +108,185 @@ if ('serviceWorker' in navigator) {
 }
 
 // ============================================
+// Service Worker Registration for PWA
+// ============================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then((registration) => {
+                console.log('ServiceWorker registered: ', registration.scope);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // New update available
+                            if (confirm('A new version is available. Reload to update?')) {
+                                window.location.reload();
+                            }
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.error('ServiceWorker registration failed: ', error);
+            });
+    });
+}
+
+// ============================================
+// Pull to Refresh for PWA
+// ============================================
+let ptrStartY = 0;
+let ptrCurrentY = 0;
+let isPtrPulling = false;
+let isPtrRefreshing = false;
+let ptrThreshold = 80; // pixels to trigger refresh
+
+function initPullToRefresh() {
+    // Only enable on PWA mode (standalone)
+    if (!window.matchMedia('(display-mode: standalone)').matches && !window.navigator.standalone) {
+        return;
+    }
+    
+    const appContainer = document.querySelector('.app-container');
+    const ptrIndicator = document.getElementById('ptrIndicator');
+    
+    if (!appContainer || !ptrIndicator) return;
+    
+    // Touch start
+    document.addEventListener('touchstart', (e) => {
+        // Only enable when at top of page
+        if (window.scrollY === 0 && !isPtrRefreshing) {
+            ptrStartY = e.touches[0].clientY;
+            isPtrPulling = true;
+        }
+    }, { passive: true });
+    
+    // Touch move
+    document.addEventListener('touchmove', (e) => {
+        if (!isPtrPulling || isPtrRefreshing) return;
+        
+        if (window.scrollY <= 0) {
+            ptrCurrentY = e.touches[0].clientY;
+            const diff = ptrCurrentY - ptrStartY;
+            
+            // Show indicator when pulling down
+            if (diff > 0) {
+                ptrIndicator.classList.add('visible');
+                
+                // Apply visual feedback
+                const progress = Math.min(diff / ptrThreshold, 1);
+                ptrIndicator.style.opacity = progress;
+            }
+        }
+    }, { passive: true });
+    
+    // Touch end
+    document.addEventListener('touchend', async (e) => {
+        if (!isPtrPulling) return;
+        isPtrPulling = false;
+        
+        const diff = ptrCurrentY - ptrStartY;
+        
+        // Check if threshold reached
+        if (diff >= ptrThreshold && !isPtrRefreshing) {
+            isPtrRefreshing = true;
+            ptrIndicator.classList.add('refreshing');
+            
+            // Perform refresh
+            await performRefresh();
+            
+            // Reset
+            ptrIndicator.classList.remove('visible', 'refreshing');
+            ptrIndicator.style.opacity = '';
+            isPtrRefreshing = false;
+        } else {
+            // Not enough pull, hide indicator
+            ptrIndicator.classList.remove('visible');
+            ptrIndicator.style.opacity = '';
+        }
+        
+        ptrStartY = 0;
+        ptrCurrentY = 0;
+    }, { passive: true });
+    
+    // Also support mouse pull for testing
+    let mouseStartY = 0;
+    let isMousePulling = false;
+    
+    document.addEventListener('mousedown', (e) => {
+        if (window.scrollY === 0 && !isPtrRefreshing) {
+            mouseStartY = e.clientY;
+            isMousePulling = true;
+        }
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isMousePulling || isPtrRefreshing) return;
+        
+        if (window.scrollY <= 0) {
+            const diff = e.clientY - mouseStartY;
+            
+            if (diff > 0) {
+                ptrIndicator.classList.add('visible');
+                const progress = Math.min(diff / ptrThreshold, 1);
+                ptrIndicator.style.opacity = progress;
+            }
+        }
+    });
+    
+    document.addEventListener('mouseup', async (e) => {
+        if (!isMousePulling) return;
+        isMousePulling = false;
+        
+        const diff = e.clientY - mouseStartY;
+        
+        if (diff >= ptrThreshold && !isPtrRefreshing) {
+            isPtrRefreshing = true;
+            ptrIndicator.classList.add('refreshing');
+            
+            await performRefresh();
+            
+            ptrIndicator.classList.remove('visible', 'refreshing');
+            ptrIndicator.style.opacity = '';
+            isPtrRefreshing = false;
+        } else {
+            ptrIndicator.classList.remove('visible');
+            ptrIndicator.style.opacity = '';
+        }
+        
+        mouseStartY = 0;
+    });
+}
+
+async function performRefresh() {
+    // Refresh all data
+    try {
+        // Reload data from Supabase
+        await loadEssays();
+        await loadSubjects();
+        await loadNotes();
+        await loadVideos();
+        await loadPlans();
+        await loadReminders();
+        await loadTodos();
+        await loadReels();
+        
+        // Show success feedback
+        showToast('Data refreshed', 'success');
+    } catch (error) {
+        console.error('Refresh failed:', error);
+        showToast('Refresh failed', 'error');
+    }
+}
+
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize pull to refresh for PWA
+    initPullToRefresh();
+    
     // Check if user is already logged in
     const isLoggedIn = sessionStorage.getItem('appLoggedIn') === 'true';
     
