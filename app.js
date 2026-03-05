@@ -2039,6 +2039,13 @@ function closeEssayModal() {
         document.body.style.overflow = '';
         window.currentEssayId = null;
     }
+    
+    // Close any open dropdowns
+    hideColorDropdownModal();
+    const tableContainer = document.getElementById('tablePickerContainerModal');
+    if (tableContainer) {
+        tableContainer.classList.remove('active');
+    }
 }
 
 function openReadEssayModal(id) {
@@ -2199,8 +2206,12 @@ function focusEditorForColorModal() {
 
 function hideColorDropdownModal() {
     const dropdown = document.getElementById('colorDropdownModal');
+    const container = document.getElementById('colorPickerContainerModal');
     if (dropdown) {
         dropdown.style.display = 'none';
+    }
+    if (container) {
+        container.classList.remove('active');
     }
 }
 
@@ -2210,9 +2221,10 @@ function toggleColorDropdownModal(e) {
     if (editor) {
         editor.focus();
     }
+    const container = document.getElementById('colorPickerContainerModal');
     const dropdown = document.getElementById('colorDropdownModal');
-    if (dropdown) {
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    if (container && dropdown) {
+        container.classList.toggle('active');
     }
 }
 
@@ -2222,9 +2234,10 @@ function toggleTableDropdownModal(e) {
     if (editor) {
         editor.focus();
     }
+    const container = document.getElementById('tablePickerContainerModal');
     const dropdown = document.getElementById('tableDropdownModal');
-    if (dropdown) {
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    if (container && dropdown) {
+        container.classList.toggle('active');
     }
 }
 

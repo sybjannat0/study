@@ -544,6 +544,37 @@ body.essay-modal-open .bottom-nav {
         background: rgba(0, 0, 0, 0.1);
         border-radius: 50%;
     }
+    
+    /* Modern dropdown styles for essay modal */
+    .color-dropdown,
+    .table-dropdown {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        transform: none !important;
+        border-radius: 20px 20px 0 0;
+        max-height: 60vh;
+        overflow-y: auto;
+        z-index: 10000;
+        padding: 20px;
+        animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+    
+    .color-picker-container,
+    .table-picker-container {
+        position: static;
+    }
 }
 
 /* Mobile responsive for essay modal */
