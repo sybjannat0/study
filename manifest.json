@@ -1,23 +1,35 @@
 {
-  "name": "AeroStudy workstation",
+  "name": "AeroStudy",
   "short_name": "AeroStudy",
-  "description": "2026 Fluid Student Desktop Workstation",
-  "start_url": "/",
+  "description": "Student Workstation 2026 - Study, Notes, and Focus",
+  "start_url": "/index.html",
   "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
   "orientation": "portrait-primary",
-  "background_color": "#f8fafc",
-  "theme_color": "#4f46e5",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "192x192",
+      "src": "/icon.svg",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "sizes": "144x144",
+      "purpose": "any"
     },
     {
-      "src": "icon.svg",
-      "sizes": "512x512",
+      "src": "/icon.svg",
       "type": "image/svg+xml",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
       "purpose": "any maskable"
     }
   ]

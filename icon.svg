@@ -1,21 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-    <defs>
-        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
-        </linearGradient>
-        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-            <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#4f46e5" flood-opacity="0.25"/>
-        </filter>
-    </defs>
-    <!-- Background Circle -->
-    <rect width="512" height="512" rx="128" fill="url(#grad1)" />
-    
-    <!-- White Minimal Graduation cap overlay -->
-    <g transform="translate(116, 126)" filter="url(#shadow)">
-        <path d="M140 32 L12 96 L140 160 L268 96 Z" fill="#ffffff" />
-        <path d="M44 126 L44 192 C44 224, 236 224, 236 192 L236 126" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M236 96 L236 192" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" />
-        <circle cx="236" cy="196" r="16" fill="#ffffff" />
-    </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+    <linearGradient id="capGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#e0e7ff" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1e1b4b" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Plate -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  
+  <!-- Inner Glow Ring -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.2"/>
+  
+  <!-- Cap / Hat Shape -->
+  <g filter="url(#shadow)">
+    <!-- Main board -->
+    <path d="M256 144 L112 216 L256 288 L400 216 Z" fill="url(#capGlow)"/>
+    <!-- Base crown -->
+    <path d="M160 240 L160 312 Q256 360 352 312 L352 240 L256 288 Z" fill="#c7d2fe"/>
+    <!-- Tassel -->
+    <path d="M256 216 Q280 250 424 256 L424 336" fill="none" stroke="#a5b4fc" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="424" cy="352" r="16" fill="#818cf8"/>
+    <circle cx="256" cy="216" r="12" fill="#818cf8"/>
+  </g>
 </svg>
