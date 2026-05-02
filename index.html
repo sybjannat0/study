@@ -602,36 +602,8 @@
                 </button>
             </div>
 
-            <!-- Notes Filters & Actions - Modern Layout -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <!-- Modern Dropdown Filter -->
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:flex-none w-full sm:w-52">
-                        <select id="note-subject-filter-select" onchange="filterNotes(this.value)" 
-                            class="w-full bg-white border border-slate-200 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-200 rounded-2xl px-4 py-3 text-sm appearance-none cursor-pointer shadow-sm">
-                            <option value="all">All Subjects</option>
-                        </select>
-                        <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <i class="fa-solid fa-chevron-down text-xs"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Search -->
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:w-72">
-                        <input type="text" id="note-search" oninput="renderNotes()" 
-                            placeholder="Search notes or drive links..." 
-                            class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300 shadow-sm">
-                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Notes Grid -->
-            <div id="notes-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="notes-grid-container" class="space-y-8">
                 <!-- Injected via JS -->
             </div>
         </section>
@@ -649,36 +621,8 @@
                 </button>
             </div>
 
-            <!-- Video Filters & Actions - Modern Layout -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <!-- Modern Dropdown Filter -->
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:flex-none w-full sm:w-52">
-                        <select id="video-subject-filter-select" onchange="filterVideos(this.value)" 
-                            class="w-full bg-white border border-slate-200 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-200 rounded-2xl px-4 py-3 text-sm appearance-none cursor-pointer shadow-sm">
-                            <option value="all">All Subjects</option>
-                        </select>
-                        <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <i class="fa-solid fa-chevron-down text-xs"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Search -->
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="relative flex-1 sm:w-72">
-                        <input type="text" id="video-search" oninput="renderVideos()" 
-                            placeholder="Search lectures..." 
-                            class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300 shadow-sm">
-                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Videos Grid -->
-            <div id="video-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="video-grid-container" class="space-y-8">
                 <!-- Injected via JS -->
             </div>
         </section>
@@ -760,7 +704,7 @@
     </div>
 
     <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-6 left-4 right-4 z-40 glass-panel rounded-2xl p-2 flex items-center justify-around border border-white/40 shadow-xl">
+    <nav class="fixed bottom-2 left-4 right-4 z-40 glass-panel rounded-2xl p-2 flex items-center justify-around border border-white/40 shadow-xl">
         <button onclick="switchTab('home')" id="mobile-tab-home" class="flex flex-col items-center justify-center p-2 text-indigo-600 cursor-pointer">
             <i class="fa-solid fa-house text-lg"></i>
             <span class="text-[10px] mt-1 font-semibold">Home</span>
@@ -829,65 +773,107 @@
         </div>
     </div>
 
-    <!-- NOTES CREATE/EDIT MODAL (Drive Link) -->
+    <!-- NOTES CREATE/EDIT MODAL (Drive Link & Folder Batch) -->
     <div id="note-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="glass-panel p-6 rounded-3xl max-w-lg w-full border border-white/60 animate-in fade-in zoom-in-95 duration-200">
+        <div class="glass-panel p-6 rounded-3xl max-w-lg w-full border border-white/60 animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="note-modal-title" class="text-base font-bold text-slate-800">Add Note from Drive</h3>
                 <button onclick="closeModal('note-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form id="note-form" onsubmit="saveNote(event)">
-                <input type="hidden" id="note-id">
-                <div class="space-y-4">
-                    <!-- Drive Link Input -->
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 block mb-1 flex items-center gap-1.5">
-                            <i class="fa-brands fa-google-drive text-emerald-600"></i> Google Drive Link
-                        </label>
-                        <input type="url" id="note-drive-link" required 
-                            placeholder="https://drive.google.com/file/d/... or https://docs.google.com/..."
-                            oninput="autoDetectNoteFields()"
-                            class="w-full px-4 py-2.5 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono text-xs">
-                        <p class="text-2xs text-slate-400 mt-1.5 flex items-center gap-1">
-                            <i class="fa-solid fa-circle-info"></i> Supports Docs, Sheets, Slides, PDFs & any Drive file
-                        </p>
-                    </div>
 
-                    <!-- Auto-rename Preview -->
-                    <div id="note-rename-preview" class="hidden bg-emerald-50/60 border border-emerald-200 rounded-xl p-3">
-                        <div class="flex items-center gap-2 mb-2">
-                            <i class="fa-brands fa-google-drive text-emerald-600 text-xs"></i>
-                            <span class="text-2xs font-semibold text-emerald-700">File Detected from Drive</span>
-                            <div class="ml-auto flex items-center gap-1">
-                                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                <span class="text-2xs text-emerald-600">Auto-fetching...</span>
+            <!-- Note Mode Toggle -->
+            <div class="flex items-center p-1 bg-slate-100 rounded-xl mb-4 flex-shrink-0">
+                <button id="btn-note-single-mode" onclick="setNoteMode('single')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all">Single File</button>
+                <button id="btn-note-batch-mode" onclick="setNoteMode('batch')" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 transition-all hover:text-slate-700">Folder Batch</button>
+            </div>
+
+            <div class="space-y-4 flex-1 overflow-y-auto pr-1 pb-4">
+                <!-- SINGLE NOTE FORM -->
+                <div id="note-single-content">
+                    <form id="note-form" onsubmit="saveNote(event)" class="space-y-4">
+                        <input type="hidden" id="note-id">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-600 block mb-1 flex items-center gap-1.5">
+                                <i class="fa-brands fa-google-drive text-emerald-600"></i> Google Drive Link
+                            </label>
+                            <input type="url" id="note-drive-link" required 
+                                placeholder="https://drive.google.com/file/d/... or https://docs.google.com/..."
+                                oninput="autoDetectNoteFields()"
+                                class="w-full px-4 py-2.5 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono text-xs">
+                            <p class="text-2xs text-slate-400 mt-1.5 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-info"></i> Supports Docs, Sheets, Slides, PDFs & any Drive file
+                            </p>
+                        </div>
+
+                        <!-- Auto-rename Preview -->
+                        <div id="note-rename-preview" class="hidden bg-emerald-50/60 border border-emerald-200 rounded-xl p-3">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-brands fa-google-drive text-emerald-600 text-xs"></i>
+                                <span class="text-2xs font-semibold text-emerald-700">File Detected from Drive</span>
+                                <div class="ml-auto flex items-center gap-1">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <span class="text-2xs text-emerald-600">Auto-fetching...</span>
+                                </div>
+                            </div>
+                            <div id="note-rename-text" class="space-y-1">
+                                <!-- Dynamic content: file name + auto-save name -->
                             </div>
                         </div>
-                        <div id="note-rename-text" class="space-y-1">
-                            <!-- Dynamic content: file name + auto-save name -->
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">Display Title</label>
+                                <input type="text" id="note-title" required placeholder="e.g. Chapter 5 Notes" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">Subject</label>
+                                <select id="note-subject" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                                    <!-- Injected -->
+                                </select>
+                            </div>
                         </div>
+
+                        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+                            <span class="text-2xs text-slate-400 flex items-center gap-1">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-500"></i> Links to Drive cloud file
+                            </span>
+                            <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md transition cursor-pointer">Save Note</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- BATCH NOTE CONTENT -->
+                <div id="note-batch-content" class="hidden space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Shared Folder URL / Folder ID</label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="batch-folder-url" 
+                                placeholder="https://drive.google.com/drive/folders/... or Folder ID" 
+                                class="flex-1 px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            <button onclick="fetchFolder()" id="btn-fetch-folder" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition cursor-pointer">
+                                Scan Folder
+                            </button>
+                        </div>
+                        <p id="note-batch-status" class="text-2xs text-slate-400 mt-1.5 hidden"></p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-600 block mb-1">Display Title</label>
-                            <input type="text" id="note-title" required placeholder="e.g. Chapter 5 Notes" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-slate-600 block mb-1">Subject</label>
-                            <select id="note-subject" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
-                                <!-- Injected -->
-                            </select>
-                        </div>
+                    <div class="mb-2">
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Subject</label>
+                        <select id="note-batch-subject" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            <!-- Injected -->
+                        </select>
                     </div>
+
+                    <!-- Scan Results List -->
+                    <div id="note-batch-results" class="hidden space-y-2 max-h-[35vh] overflow-y-auto pr-1">
+                        <!-- Injected via JS -->
+                    </div>
+
+                    <button id="btn-save-note-batch" onclick="saveBatchNotes()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md transition cursor-pointer hidden">
+                        <i class="fa-solid fa-download mr-2"></i> Import Selected (<span id="note-batch-count">0</span>)
+                    </button>
                 </div>
-                <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-                    <span class="text-2xs text-slate-400 flex items-center gap-1">
-                        <i class="fa-solid fa-cloud-arrow-up text-emerald-500"></i> Links to Drive cloud file
-                    </span>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md transition cursor-pointer">Save Note</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -939,50 +925,89 @@
 
     <!-- VIDEO CREATE/EDIT MODAL -->
     <div id="video-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="glass-panel p-6 rounded-3xl max-w-md w-full border border-white/60 animate-in fade-in zoom-in-95 duration-200">
+        <div class="glass-panel p-6 rounded-3xl max-w-lg w-full border border-white/60 animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="video-modal-title" class="text-base font-bold text-slate-800">Add Lecture Video</h3>
                 <button onclick="closeModal('video-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form id="video-form" onsubmit="saveVideo(event)">
-                <input type="hidden" id="video-id">
-                <div class="space-y-4">
+
+            <!-- Mode Toggle -->
+            <div class="flex items-center p-1 bg-slate-100 rounded-xl mb-4">
+                <button id="btn-single-mode" onclick="setVideoMode('single')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all">Single Video</button>
+                <button id="btn-batch-mode" onclick="setVideoMode('batch')" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 transition-all hover:text-slate-700">Playlist Batch</button>
+            </div>
+
+            <!-- Shared Subject Selector -->
+            <div class="mb-4">
+                <label class="text-xs font-semibold text-slate-600 block mb-1">Subject</label>
+                <select id="video-subject" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <!-- Injected -->
+                </select>
+            </div>
+
+            <div class="space-y-4 flex-1 overflow-y-auto pr-1 pb-16">
+                <!-- SINGLE MODE -->
+                <div id="single-mode-content">
+                    <form id="video-form" onsubmit="saveVideo(event)" class="space-y-4">
+                        <input type="hidden" id="video-id">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-600 block mb-1 flex items-center gap-1.5">
+                                <i class="fa-brands fa-youtube text-rose-600"></i> YouTube URL
+                            </label>
+                            <input type="text" id="video-url" required 
+                                placeholder="https://www.youtube.com/watch?v=..." 
+                                oninput="autoDetectVideoFields()"
+                                class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        </div>
+                        <!-- Auto-fetch Video Info -->
+                        <div id="video-fetch-preview" class="hidden bg-rose-50/60 border border-rose-200 rounded-xl p-3">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-brands fa-youtube text-rose-600 text-xs"></i>
+                                <span class="text-2xs font-semibold text-rose-700">Video Detected</span>
+                            </div>
+                            <div id="video-fetch-text" class="space-y-1 mt-1">
+                                <!-- Dynamic title goes here -->
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-600 block mb-1">Display Title</label>
+                                <input type="text" id="video-title" required placeholder="Lecture Title" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md transition cursor-pointer">Save Video</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- BATCH MODE -->
+                <div id="batch-mode-content" class="hidden space-y-4">
                     <div>
                         <label class="text-xs font-semibold text-slate-600 block mb-1 flex items-center gap-1.5">
-                            <i class="fa-brands fa-youtube text-rose-600"></i> YouTube URL
+                            <i class="fa-solid fa-list text-indigo-600"></i> Playlist URL
                         </label>
-                        <input type="text" id="video-url" required 
-                            placeholder="https://www.youtube.com/watch?v=..." 
-                            oninput="autoDetectVideoFields()"
-                            class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                    </div>
-                    <!-- Auto-fetch Video Info -->
-                    <div id="video-fetch-preview" class="hidden bg-rose-50/60 border border-rose-200 rounded-xl p-3">
                         <div class="flex items-center gap-2">
-                            <i class="fa-brands fa-youtube text-rose-600 text-xs"></i>
-                            <span class="text-2xs font-semibold text-rose-700">Video Detected</span>
+                            <input type="text" id="batch-playlist-url" 
+                                placeholder="https://www.youtube.com/playlist?list=..." 
+                                class="flex-1 px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                            <button onclick="fetchPlaylist()" id="btn-fetch-playlist" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md transition cursor-pointer">
+                                Fetch
+                            </button>
                         </div>
-                        <div id="video-fetch-text" class="space-y-1 mt-1">
-                            <!-- Dynamic title goes here -->
-                        </div>
+                        <p id="batch-status" class="text-2xs text-slate-400 mt-1.5 hidden"></p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-600 block mb-1">Display Title</label>
-                            <input type="text" id="video-title" required placeholder="Lecture Title" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-slate-600 block mb-1">Subject</label>
-                            <select id="video-subject" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
-                                <!-- Injected -->
-                            </select>
-                        </div>
+
+                    <!-- Batch Results List -->
+                    <div id="batch-results-container" class="hidden space-y-2 max-h-[35vh] overflow-y-auto pr-1 custom-scrollbar">
+                        <!-- Injected JS -->
                     </div>
+
+                    <button id="btn-save-batch" onclick="saveBatchVideos()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md transition cursor-pointer hidden">
+                        <i class="fa-solid fa-download mr-2"></i> Save Selected (<span id="batch-count">0</span>)
+                    </button>
                 </div>
-                <div class="mt-6 flex space-x-2">
-                    <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md transition cursor-pointer">Save Video</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -1229,6 +1254,8 @@
         let focusSettings = { autoRename: true, cloudSync: true, editMode: true };
         let studyStreak = 5;
         let totalStudyHours = 14.2;
+        let noteOrder = [];
+        let videoOrder = [];
 
         // Fetch everything from Supabase
         async function loadSupabaseData() {
@@ -1284,10 +1311,37 @@
 
                     const settingsObj = metaData.find(m => m.key === 'focus_settings');
                     if (settingsObj) focusSettings = JSON.parse(settingsObj.value);
-                    console.log('✅ Loaded settings');
+
+                    const noteOrderObj = metaData.find(m => m.key === 'notes_order');
+                    if (noteOrderObj) noteOrder = JSON.parse(noteOrderObj.value);
+
+                    const videoOrderObj = metaData.find(m => m.key === 'videos_order');
+                    if (videoOrderObj) videoOrder = JSON.parse(videoOrderObj.value);
+
+                    console.log('✅ Loaded settings & custom ordering arrays');
                 }
             } catch (error) {
                 console.error("❌ Failed to load Supabase data:", error);
+            }
+
+            // Apply custom ordering strings
+            if (noteOrder && noteOrder.length > 0) {
+                notes.sort((a, b) => {
+                    const indexA = noteOrder.indexOf(a.id.toString());
+                    const indexB = noteOrder.indexOf(b.id.toString());
+                    if (indexA === -1) return 1;
+                    if (indexB === -1) return -1;
+                    return indexA - indexB;
+                });
+            }
+            if (videoOrder && videoOrder.length > 0) {
+                videos.sort((a, b) => {
+                    const indexA = videoOrder.indexOf(a.id.toString());
+                    const indexB = videoOrder.indexOf(b.id.toString());
+                    if (indexA === -1) return 1;
+                    if (indexB === -1) return -1;
+                    return indexA - indexB;
+                });
             }
             
             // Re-sync UI
@@ -1412,6 +1466,66 @@
                 menu.classList.add('hidden');
             }
         });
+
+        // ====== DRAG AND DROP REARRANGE ======
+        let draggedItemId = null;
+        let draggedItemType = null;
+
+        function handleDragStart(e, id, type) {
+            draggedItemId = id;
+            draggedItemType = type;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', id);
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault(); 
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        async function handleDrop(e, targetId, type) {
+            e.stopPropagation();
+            if (!draggedItemId || draggedItemType !== type || draggedItemId === targetId) return;
+
+            if (type === 'notes') {
+                const dragIndex = notes.findIndex(n => n.id.toString() === draggedItemId.toString());
+                const dropIndex = notes.findIndex(n => n.id.toString() === targetId.toString());
+                
+                if (dragIndex !== -1 && dropIndex !== -1) {
+                    // Swap elements
+                    const item = notes.splice(dragIndex, 1)[0];
+                    notes.splice(dropIndex, 0, item);
+                    
+                    // Save array order
+                    noteOrder = notes.map(n => n.id.toString());
+                    await saveSupabaseItem('settings', {
+                        key: 'notes_order',
+                        value: JSON.stringify(noteOrder)
+                    });
+                    renderNotes();
+                }
+            } else if (type === 'videos') {
+                const dragIndex = videos.findIndex(v => v.id.toString() === draggedItemId.toString());
+                const dropIndex = videos.findIndex(v => v.id.toString() === targetId.toString());
+                
+                if (dragIndex !== -1 && dropIndex !== -1) {
+                    // Swap elements
+                    const item = videos.splice(dragIndex, 1)[0];
+                    videos.splice(dropIndex, 0, item);
+                    
+                    // Save array order
+                    videoOrder = videos.map(v => v.id.toString());
+                    await saveSupabaseItem('settings', {
+                        key: 'videos_order',
+                        value: JSON.stringify(videoOrder)
+                    });
+                    renderVideos();
+                }
+            }
+        }
 
         function switchTab(tabName) {
             currentTab = tabName;
@@ -1725,95 +1839,148 @@
         }
 
         // NOTES TAB
-        function filterNotes(sub) {
-            currentFilterNotes = sub;
+        let expandedSubjectNote = null;
+
+        function toggleSubjectNote(subName) {
+            expandedSubjectNote = expandedSubjectNote === subName ? null : subName;
             renderNotes();
         }
 
         function renderNotes() {
-            // Populate modern dropdown
-            const select = document.getElementById('note-subject-filter-select');
-            if (select) {
-                let html = `<option value="all" ${currentFilterNotes === 'all' ? 'selected' : ''}>All Subjects</option>`;
-                subjects.forEach(s => {
-                    const selected = currentFilterNotes === s.name ? 'selected' : '';
-                    html += `<option value="${s.name}" ${selected}>${s.name}</option>`;
-                });
-                select.innerHTML = html;
-            }
-
             const grid = document.getElementById('notes-grid-container');
-            const searchVal = document.getElementById('note-search').value.toLowerCase();
+            if (!grid) return;
+
+            let html = '';
             
-            let list = notes;
-            if (currentFilterNotes !== 'all') list = notes.filter(n => n.subject === currentFilterNotes);
-            if (searchVal) list = list.filter(n => n.title.toLowerCase().includes(searchVal) || n.driveLink.toLowerCase().includes(searchVal));
+            if (expandedSubjectNote) {
+                // Showing items of a specific subject
+                const subject = subjects.find(s => s.name === expandedSubjectNote);
+                if (!subject) {
+                    expandedSubjectNote = null;
+                    renderNotes();
+                    return;
+                }
 
-            if (list.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">No notes found. Click "New Note" to create.</div>`;
-                return;
-            }
+                const subjectNotes = notes.filter(n => n.subject === subject.name);
+                const hex = getColorHex(subject.color);
+                const cClasses = getColorClasses(subject.color);
 
-            grid.innerHTML = list.map(n => {
-                const subObj = subjects.find(s => s.name === n.subject) || subjects[0];
-                const cClasses = getColorClasses(subObj.color);
-
-                // Auto rename simulation (no subject prefix, no extension)
-                const displayTitle = n.title;
-
-                // File type icon
-                const typeInfo = getNoteTypeInfo(n.fileType || 'other');
-
-                return `
-                <div class="glass-card p-5 rounded-3xl flex flex-col cursor-pointer group relative overflow-hidden border border-white/80 hover:border-indigo-400/50 hover:shadow-xl hover:shadow-indigo-50/40 hover:-translate-y-1 transition-all duration-300 h-full" onclick="viewNote(${n.id})">
-                    
-                    <!-- Background Soft Glow matching the subject color -->
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-2xl opacity-15" style="background-color: ${getColorHex(subObj.color)}"></div>
-
-                    <div class="relative z-10 flex flex-col gap-3.5">
-                        <!-- Header with Category Tag and Actions -->
-                        <div class="flex justify-between items-start gap-2">
-                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${cClasses} tracking-wide border uppercase">
-                                ${n.subject}
-                            </span>
-                            <div class="flex items-center gap-0.5 ${focusSettings.editMode === false ? 'hidden' : ''}" onclick="event.stopPropagation()">
-                                <button onclick="editNoteModal(${n.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition cursor-pointer" title="Edit">
-                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
-                                </button>
-                                <button onclick="deleteNote(${n.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition cursor-pointer" title="Delete">
-                                    <i class="fa-solid fa-trash text-xs"></i>
-                                </button>
+                html = `
+                <div class="space-y-6">
+                    <!-- Nav Bar for Sub-view -->
+                    <div class="flex items-center justify-between bg-white/60 backdrop-blur-xl border border-white/60 p-3 rounded-2xl">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <button onclick="toggleSubjectNote(null)" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 transition cursor-pointer flex-shrink-0 active:scale-95">
+                                <i class="fa-solid fa-arrow-left text-sm"></i>
+                            </button>
+                            <div class="min-w-0">
+                                <h3 class="text-sm font-bold text-slate-800 leading-tight flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full shadow-sm flex-shrink-0" style="background-color: ${hex}"></div>
+                                    ${subject.name}
+                                </h3>
+                                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Study Notes (${subjectNotes.length} items)</p>
                             </div>
-                        </div>
-
-                        <!-- Document Identity -->
-                        <div class="flex items-start gap-3">
-                            <div class="note-type-icon ${typeInfo.iconClass} flex-shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center text-lg shadow-sm border border-white/60">
-                                <i class="fa-solid ${typeInfo.icon}"></i>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-indigo-600 transition">
-                                    ${displayTitle}
-                                </h4>
-                                <span class="text-[10px] text-slate-400 font-medium block mt-0.5">
-                                    ${typeInfo.label}
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Date & Sync Status -->
-                        <div class="flex justify-between items-center text-[10px] font-semibold text-slate-400 px-1 border-t border-slate-100/60 pt-2.5">
-                            <span class="flex items-center gap-1">
-                                <i class="fa-regular fa-clock text-slate-300"></i> ${n.date}
-                            </span>
-                            <span class="flex items-center gap-1.5 text-emerald-600 bg-emerald-50/60 border border-emerald-100/60 px-2 py-0.5 rounded-md">
-                                <i class="fa-brands fa-google-drive text-xs"></i> Synced
-                            </span>
                         </div>
                     </div>
+
+                    ${subjectNotes.length === 0 ? `
+                        <div class="text-center py-16 text-slate-400 text-sm bg-white/40 border border-slate-200/60 rounded-3xl">No notes found under ${subject.name}. Click "New Note" to create one.</div>
+                    ` : `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${subjectNotes.map((n, idx) => {
+                                const typeInfo = getNoteTypeInfo(n.fileType || 'other');
+                                const displayTitle = n.title;
+                                
+                                return `
+                                <div class="glass-card p-5 rounded-3xl flex flex-col cursor-pointer group relative overflow-hidden border border-white/80 hover:border-indigo-400/50 hover:shadow-xl hover:shadow-indigo-50/40 hover:-translate-y-1 transition-all duration-300 h-full" 
+                                    draggable="${focusSettings.editMode !== false}" 
+                                    ${focusSettings.editMode !== false ? `ondragstart="handleDragStart(event, '${n.id}', 'notes')" ondragover="handleDragOver(event)" ondrop="handleDrop(event, '${n.id}', 'notes')"` : ''}
+                                    onclick="viewNote(${n.id})">
+                                    
+                                    <!-- Background Soft Glow matching the subject color -->
+                                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-2xl opacity-15" style="background-color: ${hex}"></div>
+
+                                    <div class="relative z-10 flex flex-col gap-3.5">
+                                        <!-- Header with Actions -->
+                                        <div class="flex justify-end items-start gap-2">
+                                            <div class="flex items-center gap-0.5 ${focusSettings.editMode === false ? 'hidden' : ''}" onclick="event.stopPropagation()">
+                                                <button onclick="editNoteModal(${n.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition cursor-pointer" title="Edit">
+                                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                                </button>
+                                                <button onclick="deleteNote(${n.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition cursor-pointer" title="Delete">
+                                                    <i class="fa-solid fa-trash text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Document Identity -->
+                                        <div class="flex items-start gap-3">
+                                            <div class="note-type-icon ${typeInfo.iconClass} flex-shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center text-lg shadow-sm border border-white/60">
+                                                <i class="fa-solid ${typeInfo.icon}"></i>
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-indigo-600 transition">
+                                                    ${displayTitle}
+                                                </h4>
+                                                <span class="text-[10px] text-slate-400 font-medium block mt-0.5">
+                                                    ${typeInfo.label}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Date & Sync Status -->
+                                        <div class="flex justify-between items-center text-[10px] font-semibold text-slate-400 px-1 border-t border-slate-100/60 pt-2.5">
+                                            <span class="flex items-center gap-1">
+                                                <i class="fa-regular fa-clock text-slate-300"></i> ${n.date}
+                                            </span>
+                                            <span class="flex items-center gap-1.5 text-emerald-600 bg-emerald-50/60 border border-emerald-100/60 px-2 py-0.5 rounded-md">
+                                                <i class="fa-brands fa-google-drive text-xs"></i> Synced
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `}
                 </div>
                 `;
-            }).join('');
+            } else {
+                // High level Grid of Subject Cards
+                html = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${subjects.map(subject => {
+                        const subjectNotes = notes.filter(n => n.subject === subject.name);
+                        const hex = getColorHex(subject.color);
+                        const cClasses = getColorClasses(subject.color);
+
+                        return `
+                        <div onclick="toggleSubjectNote('${subject.name}')" 
+                            class="glass-panel p-6 rounded-3xl border border-white/60 hover:border-indigo-400/40 hover:shadow-xl hover:-translate-y-1 cursor-pointer transition duration-300 relative overflow-hidden flex flex-col justify-between h-[160px] group">
+                            
+                            <div class="absolute -right-8 -bottom-8 w-24 h-24 rounded-full blur-xl opacity-15" style="background-color: ${hex}"></div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <!-- Dynamic Color Swatch/Tag -->
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center border text-xl shadow-sm ${cClasses}">
+                                        <i class="fa-solid fa-book-open"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+                                        ${subjectNotes.length} files
+                                    </span>
+                                </div>
+                                <h3 class="text-base font-bold text-slate-800 leading-snug group-hover:text-indigo-600 transition truncate">${subject.name}</h3>
+                                <p class="text-2xs font-semibold text-slate-400 mt-1">Tap to see items</p>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+                `;
+            }
+
+            grid.innerHTML = html;
         }
 
         // VIDEOS TAB
@@ -1822,88 +1989,152 @@
             renderVideos();
         }
 
+        // VIDEOS TAB
+        let expandedSubjectVideo = null;
+
+        function toggleSubjectVideo(subName) {
+            expandedSubjectVideo = expandedSubjectVideo === subName ? null : subName;
+            renderVideos();
+        }
+
         function renderVideos() {
-            // Populate modern dropdown
-            const select = document.getElementById('video-subject-filter-select');
-            if (select) {
-                let html = `<option value="all" ${currentFilterVideos === 'all' ? 'selected' : ''}>All Subjects</option>`;
-                subjects.forEach(s => {
-                    const selected = currentFilterVideos === s.name ? 'selected' : '';
-                    html += `<option value="${s.name}" ${selected}>${s.name}</option>`;
-                });
-                select.innerHTML = html;
-            }
-
             const grid = document.getElementById('video-grid-container');
-            const searchVal = document.getElementById('video-search') ? document.getElementById('video-search').value.toLowerCase() : '';
-            
-            let list = videos;
-            if (currentFilterVideos !== 'all') list = videos.filter(v => v.subject === currentFilterVideos);
-            if (searchVal) list = list.filter(v => v.title.toLowerCase().includes(searchVal) || v.url.toLowerCase().includes(searchVal));
+            if (!grid) return;
 
-            if (list.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">No lectures found. Click "Add Video" to add lectures.</div>`;
-                return;
-            }
+            let html = '';
 
-            grid.innerHTML = list.map(v => {
-                const subObj = subjects.find(s => s.name === v.subject) || subjects[0];
-                const cClasses = getColorClasses(subObj.color);
-                
-                const displayTitle = v.title;
+            if (expandedSubjectVideo) {
+                // Showing items of a specific subject
+                const subject = subjects.find(s => s.name === expandedSubjectVideo);
+                if (!subject) {
+                    expandedSubjectVideo = null;
+                    renderVideos();
+                    return;
+                }
 
-                return `
-                <div class="glass-card rounded-3xl flex flex-col overflow-hidden group border border-white/80 hover:border-indigo-400/50 hover:shadow-xl hover:shadow-indigo-50/40 hover:-translate-y-1 transition-all duration-300 h-full relative" onclick="playVideo('${v.videoId}', '${displayTitle}')">
-                    
-                    <!-- Gradient Soft Glow -->
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-2xl opacity-10" style="background-color: ${getColorHex(subObj.color)}"></div>
+                const subjectVideos = videos.filter(v => v.subject === subject.name);
+                const hex = getColorHex(subject.color);
+                const cClasses = getColorClasses(subject.color);
 
-                    <!-- Video Thumbnail / Play Action -->
-                    <div class="relative aspect-video bg-slate-900 flex items-center justify-center cursor-pointer overflow-hidden m-2 rounded-2xl shadow-sm">
-                        <img src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg" class="w-full h-full object-cover opacity-85 group-hover:scale-105 transition duration-300" alt="Thumbnail">
-                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/30 flex items-center justify-center transition">
-                            <div class="w-12 h-12 rounded-full bg-white/90 backdrop-blur-md shadow-md flex items-center justify-center text-indigo-600 text-base group-hover:scale-110 transition duration-300">
-                                <i class="fa-solid fa-play ml-1"></i>
+                html = `
+                <div class="space-y-6">
+                    <!-- Nav Bar for Sub-view -->
+                    <div class="flex items-center justify-between bg-white/60 backdrop-blur-xl border border-white/60 p-3 rounded-2xl">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <button onclick="toggleSubjectVideo(null)" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 transition cursor-pointer flex-shrink-0 active:scale-95">
+                                <i class="fa-solid fa-arrow-left text-sm"></i>
+                            </button>
+                            <div class="min-w-0">
+                                <h3 class="text-sm font-bold text-slate-800 leading-tight flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full shadow-sm flex-shrink-0" style="background-color: ${hex}"></div>
+                                    ${subject.name}
+                                </h3>
+                                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Lecture Videos (${subjectVideos.length} items)</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-4 pt-1 flex flex-col justify-between flex-1 relative z-10">
-                        <div>
-                            <!-- Header with Category Tag and Actions -->
-                            <div class="flex justify-between items-center gap-2 mb-2">
-                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${cClasses} tracking-wide border uppercase">
-                                    ${v.subject}
-                                </span>
-                                <div class="flex items-center gap-0.5" onclick="event.stopPropagation()">
-                                    <button onclick="editVideoModal(${v.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition cursor-pointer" title="Edit">
-                                        <i class="fa-solid fa-pen-to-square text-xs"></i>
-                                    </button>
-                                    <button onclick="deleteVideo(${v.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition cursor-pointer" title="Delete">
-                                        <i class="fa-solid fa-trash text-xs"></i>
-                                    </button>
+                    ${subjectVideos.length === 0 ? `
+                        <div class="text-center py-16 text-slate-400 text-sm bg-white/40 border border-slate-200/60 rounded-3xl">No videos found under ${subject.name}. Click "Add Video" to add one.</div>
+                    ` : `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${subjectVideos.map((v, idx) => {
+                                const displayTitle = v.title;
+                                
+                                return `
+                                <div class="glass-card rounded-3xl flex flex-col overflow-hidden group border border-white/80 hover:border-indigo-400/50 hover:shadow-xl hover:shadow-indigo-50/40 hover:-translate-y-1 transition-all duration-300 h-full relative" 
+                                    draggable="${focusSettings.editMode !== false}" 
+                                    ${focusSettings.editMode !== false ? `ondragstart="handleDragStart(event, '${v.id}', 'videos')" ondragover="handleDragOver(event)" ondrop="handleDrop(event, '${v.id}', 'videos')"` : ''}
+                                    onclick="playVideo('${v.videoId}', '${displayTitle}')">
+                                    
+                                    <!-- Gradient Soft Glow -->
+                                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-2xl opacity-10" style="background-color: ${hex}"></div>
+
+                                    <!-- Video Thumbnail / Play Action -->
+                                    <div class="relative aspect-video bg-slate-900 flex items-center justify-center cursor-pointer overflow-hidden m-2 rounded-2xl shadow-sm">
+                                        <img src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg" class="w-full h-full object-cover opacity-85 group-hover:scale-105 transition duration-300" alt="Thumbnail">
+                                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/30 flex items-center justify-center transition">
+                                            <div class="w-12 h-12 rounded-full bg-white/90 backdrop-blur-md shadow-md flex items-center justify-center text-indigo-600 text-base group-hover:scale-110 transition duration-300">
+                                                <i class="fa-solid fa-play ml-1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-4 pt-1 flex flex-col justify-between flex-1 relative z-10">
+                                        <div>
+                                            <!-- Header with Actions -->
+                                            <div class="flex justify-end items-center gap-0.5 mb-2" onclick="event.stopPropagation()">
+                                                <button onclick="editVideoModal(${v.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition cursor-pointer" title="Edit">
+                                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                                </button>
+                                                <button onclick="deleteVideo(${v.id})" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition cursor-pointer" title="Delete">
+                                                    <i class="fa-solid fa-trash text-xs"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Lecture Title -->
+                                            <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-tight group-hover:text-indigo-600 transition mb-3">
+                                                ${displayTitle}
+                                            </h4>
+                                        </div>
+
+                                        <!-- Date & YouTube Status Badge -->
+                                        <div class="flex justify-between items-center text-[10px] font-semibold text-slate-400 border-t border-slate-100/60 pt-3">
+                                            <span class="flex items-center gap-1">
+                                                <i class="fa-regular fa-clock text-slate-300"></i> ${v.date}
+                                            </span>
+                                            <span class="flex items-center gap-1.5 text-rose-600 bg-rose-50/60 border border-rose-100/60 px-2 py-0.5 rounded-md">
+                                                <i class="fa-brands fa-youtube text-xs"></i> YouTube
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Lecture Title -->
-                            <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-tight group-hover:text-indigo-600 transition mb-3">
-                                ${displayTitle}
-                            </h4>
+                                `;
+                            }).join('')}
                         </div>
-
-                        <!-- Date & YouTube Status Badge -->
-                        <div class="flex justify-between items-center text-[10px] font-semibold text-slate-400 border-t border-slate-100/60 pt-3">
-                            <span class="flex items-center gap-1">
-                                <i class="fa-regular fa-clock text-slate-300"></i> ${v.date}
-                            </span>
-                            <span class="flex items-center gap-1.5 text-rose-600 bg-rose-50/60 border border-rose-100/60 px-2 py-0.5 rounded-md">
-                                <i class="fa-brands fa-youtube text-xs"></i> YouTube
-                            </span>
-                        </div>
-                    </div>
+                    `}
                 </div>
                 `;
-            }).join('');
+            } else {
+                // High level Grid of Subject Cards
+                html = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${subjects.map(subject => {
+                        const subjectVideos = videos.filter(v => v.subject === subject.name);
+                        const hex = getColorHex(subject.color);
+                        const cClasses = getColorClasses(subject.color);
+
+                        return `
+                        <div onclick="toggleSubjectVideo('${subject.name}')" 
+                            class="glass-panel p-6 rounded-3xl border border-white/60 hover:border-indigo-400/40 hover:shadow-xl hover:-translate-y-1 cursor-pointer transition duration-300 relative overflow-hidden flex flex-col justify-between h-[160px] group">
+                            
+                            <div class="absolute -right-8 -bottom-8 w-24 h-24 rounded-full blur-xl opacity-15" style="background-color: ${hex}"></div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <!-- Dynamic Color Swatch/Tag -->
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center border text-xl shadow-sm ${cClasses}">
+                                        <i class="fa-solid fa-video"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+                                        ${subjectVideos.length} files
+                                    </span>
+                                </div>
+                                <h3 class="text-base font-bold text-slate-800 leading-snug group-hover:text-indigo-600 transition truncate">${subject.name}</h3>
+                                <p class="text-2xs font-semibold text-slate-400 mt-1">Tap to see videos</p>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+                `;
+            }
+
+            if (html === '') {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">No lectures found. Click "Add Video" to add lectures.</div>`;
+            } else {
+                grid.innerHTML = html;
+            }
         }
 
         // MANAGEMENT TAB
@@ -2007,12 +2238,336 @@
         }
 
         // NOTES CRUD
+        let noteBatchFilesCache = [];
+
         function openNoteModal() {
             document.getElementById('note-id').value = '';
             document.getElementById('note-form').reset();
             document.getElementById('note-modal-title').innerText = "Add Note from Drive";
             document.getElementById('note-rename-preview').classList.add('hidden');
+            document.getElementById('note-batch-results').classList.add('hidden');
+            document.getElementById('note-batch-results').innerHTML = '';
+            document.getElementById('btn-save-note-batch').classList.add('hidden');
+            document.getElementById('note-batch-status').classList.add('hidden');
+            document.getElementById('batch-folder-url').value = '';
+            
+            // Re-populate batch subject select
+            const batchSubjectSelect = document.getElementById('note-batch-subject');
+            if (batchSubjectSelect) {
+                let optionsHtml = '';
+                subjects.forEach(s => {
+                    optionsHtml += `<option value="${s.name}">${s.name}</option>`;
+                });
+                batchSubjectSelect.innerHTML = optionsHtml;
+            }
+
+            setNoteMode('single');
             openModal('note-modal');
+        }
+
+        function setNoteMode(mode) {
+            const singleBtn = document.getElementById('btn-note-single-mode');
+            const batchBtn = document.getElementById('btn-note-batch-mode');
+            const singleContent = document.getElementById('note-single-content');
+            const batchContent = document.getElementById('note-batch-content');
+
+            if (mode === 'single') {
+                singleBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all";
+                batchBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 transition-all hover:text-slate-700";
+                singleContent.classList.remove('hidden');
+                batchContent.classList.add('hidden');
+            } else {
+                batchBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all";
+                singleBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 transition-all hover:text-slate-700";
+                batchContent.classList.remove('hidden');
+                singleContent.classList.add('hidden');
+            }
+        }
+
+        function extractFolderId(url) {
+            // Pattern 1: drive/folders/{id}
+            let match = url.match(/\/folders\/([a-zA-Z0-9_-]{10,})/);
+            if (match) return match[1];
+
+            // Pattern 2: ?id={id}
+            match = url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+            if (match) return match[1];
+
+            // Direct fallback to raw folder ID
+            if (/^[a-zA-Z0-9_-]{10,}$/.test(url.trim())) {
+                return url.trim();
+            }
+            return null;
+        }
+
+        function guessFileType(title, fileId, mimeType) {
+            if (mimeType) {
+                if (mimeType.includes('pdf')) return 'pdf';
+                if (mimeType.includes('spreadsheet')) return 'sheet';
+                if (mimeType.includes('presentation')) return 'slide';
+                if (mimeType.includes('document')) return 'doc';
+                return 'other';
+            }
+            const lower = title.toLowerCase();
+            if (lower.includes('.pdf')) return 'pdf';
+            if (lower.includes('.docx') || lower.includes('.doc')) return 'doc';
+            if (lower.includes('.xlsx') || lower.includes('.xls') || lower.includes('spreadsheet')) return 'sheet';
+            if (lower.includes('.pptx') || lower.includes('.ppt')) return 'slide';
+            if (fileId && fileId.length > 25) return 'doc';
+            return 'other';
+        }
+
+        async function fetchFolder() {
+            const urlInput = document.getElementById('batch-folder-url');
+            const url = urlInput.value.trim();
+            const folderId = extractFolderId(url);
+            const status = document.getElementById('note-batch-status');
+            const resultsContainer = document.getElementById('note-batch-results');
+            const fetchBtn = document.getElementById('btn-fetch-folder');
+
+            if (!folderId) {
+                status.textContent = "Invalid folder link. Please paste a valid Google Drive folder link.";
+                status.classList.remove('hidden');
+                status.className = "text-2xs text-rose-600 mt-1.5";
+                return;
+            }
+
+            status.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Scanning folder for files...';
+            status.classList.remove('hidden');
+            status.className = "text-2xs text-indigo-600 mt-1.5";
+            fetchBtn.disabled = true;
+            fetchBtn.classList.add('opacity-50');
+
+            // Try multiple Drive views + proxy combos
+            const folderViews = [
+                `https://drive.google.com/embeddedfolderview?id=${folderId}#list`,
+                `https://drive.google.com/embeddedfolderview?id=${folderId}`,
+                `https://drive.google.com/drive/folders/${folderId}`
+            ];
+
+            let fetchedFiles = [];
+            let html = '';
+
+            // Gather all HTML content first across proxies and views
+            for (let v = 0; v < folderViews.length && fetchedFiles.length === 0; v++) {
+                const fUrl = folderViews[v];
+                const proxies = [
+                    `https://api.allorigins.win/get?url=${encodeURIComponent(fUrl)}`,
+                    `https://corsproxy.io/?${encodeURIComponent(fUrl)}`,
+                    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fUrl)}`
+                ];
+
+                for (let p = 0; p < proxies.length; p++) {
+                    try {
+                        const response = await fetch(proxies[p], { signal: AbortSignal.timeout(8000) });
+                        if (!response.ok) continue;
+
+                        if (proxies[p].includes('allorigins')) {
+                            const json = await response.json();
+                            html = json.contents;
+                        } else {
+                            html = await response.text();
+                        }
+                        if (!html) continue;
+
+                        // === APPROACH 1: Extract data from JSON objects inside script tags ===
+                        // Drive often embeds {title:"My File",fileId:"..."} patterns
+                        let fileDataMatches = html.matchAll(/"title"\s*:\s*"((?:\\.|[^"\\])*)"[^}]*?"fileId"\s*:\s*"((?:\\.|[^"\\])*)"/g);
+                        let foundCount = 0;
+                        const seen1 = new Set();
+                        for (const m of fileDataMatches) {
+                            const t = m[1].replace(/\\"/g, '"').replace(/\\'/g, "'").replace(/\\\//g, '/');
+                            const fid = m[2];
+                            if (!seen1.has(fid) && fid.length > 20) {
+                                seen1.add(fid);
+                                const fType = guessFileType(t, fid);
+                                fetchedFiles.push({ id: Date.now() + '-' + foundCount, title: t.split('.').slice(0,-1).join('.') || t, driveLink: `https://drive.google.com/file/d/${fid}/view`, fileId: fid, fileType: fType, selected: true });
+                                foundCount++;
+                            }
+                        }
+                        if (fetchedFiles.length > 0) break;
+
+                        // === APPROACH 2: Parse title/fileId from JSON blobs like "label":"File Name","ariaLabel":"File Name" + nearby data-id ===
+                        // Look for patterns with data-id="file:ID" and nearby label text
+                        const dataIdRegex = html.matchAll(/data-id="file:([a-zA-Z0-9_-]{25,})"[^>]*>[\s\S]{0,200}?(?:aria-label|title)="([^"]+)"/g);
+                        const seen2 = new Set();
+                        for (const m of dataIdRegex) {
+                            const fid = m[1];
+                            let title = m[2].trim();
+                            if (!seen2.has(fid) && fid.length > 20 && title) {
+                                seen2.add(fid);
+                                const fType = guessFileType(title, fid);
+                                fetchedFiles.push({ id: Date.now() + '-' + seen2.size, title: title.split('.').slice(0,-1).join('.') || title, driveLink: `https://drive.google.com/file/d/${fid}/view`, fileId: fid, fileType: fType, selected: true });
+                            }
+                        }
+                        if (fetchedFiles.length > 0) break;
+
+                        // === APPROACH 3: Classic anchor extraction ===
+                        const anchorRegex = html.matchAll(/<a[^>]*href="[^"]*\/file\/d\/([a-zA-Z0-9_-]{25,})[^"]*"[^>]*>([\s\S]{0,150})<\/a>/gi);
+                        const seen3 = new Set();
+                        for (const m of anchorRegex) {
+                            const fid = m[1];
+                            const snippet = m[2].replace(/<[^>]+>/g, ' ').trim();
+                            if (!seen3.has(fid) && fid.length > 20) {
+                                seen3.add(fid);
+                                // Try to extract a clean title from the snippet
+                                let title = snippet.replace(/\s+/g, ' ').trim();
+                                // If snippet is empty or too long, use a placeholder
+                                if (!title || title.length > 100 || title.length < 2) title = 'File';
+                                const fType = guessFileType(title, fid);
+                                fetchedFiles.push({ id: Date.now() + '-' + seen3.size, title: title.replace(/\.(pdf|docx?|xlsx?|pptx?)$/i, ''), driveLink: `https://drive.google.com/file/d/${fid}/view`, fileId: fid, fileType: fType, selected: true });
+                            }
+                        }
+                        if (fetchedFiles.length > 0) break;
+
+                    } catch (e) {
+                        console.warn(`Drive fetch attempt view=${v} proxy=${p} failed:`, e);
+                    }
+                }
+            }
+
+            // === APPROACH 4: If scraping fails, use the Google Drive API v3 directly (no key needed for public files) ===
+            if (fetchedFiles.length === 0) {
+                status.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Trying alternate scanning method...';
+                try {
+                    // Use Drive API to query files in folder
+                    const apiUrl = `https://www.googleapis.com/drive/v3/files?q=%27${folderId}%27+in+parents&fields=files(id,name,mimeType)&key=AIzaSyDJPbEcS_h5_6u_ST4_s4o-9xCcJm8e0RA`;
+                    const resp = await fetch(apiUrl);
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        if (data.files && data.files.length > 0) {
+                            data.files.forEach((f, idx) => {
+                                const fType = f.mimeType.includes('pdf') ? 'pdf' : f.mimeType.includes('spreadsheet') ? 'sheet' : f.mimeType.includes('presentation') ? 'slide' : f.mimeType.includes('document') ? 'doc' : 'other';
+                                const name = f.name.replace(/\.(pdf|docx?|xlsx?|pptx?)$/i, '');
+                                fetchedFiles.push({
+                                    id: Date.now() + '-' + idx,
+                                    title: name,
+                                    driveLink: `https://drive.google.com/file/d/${f.id}/view`,
+                                    fileId: f.id,
+                                    fileType: fType,
+                                    selected: true
+                                });
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Drive API approach also failed:', e);
+                }
+            }
+
+            // Last resort fallback
+            if (fetchedFiles.length === 0) {
+                fetchedFiles.push({
+                    id: Date.now().toString(),
+                    title: `Folder Resources (${folderId.substring(0,12)}...)`,
+                    driveLink: `https://drive.google.com/drive/folders/${folderId}`,
+                    fileId: folderId,
+                    fileType: 'other',
+                    selected: true
+                });
+            }
+
+            // Fallback: If no files extracted, generate a dummy preview item using folder's direct ID
+            if (fetchedFiles.length === 0) {
+                console.warn('⚠️ Scraping empty or failed, loading folder itself as single note');
+                fetchedFiles.push({
+                    id: Date.now().toString(),
+                    title: `Drive Folder Resources`,
+                    driveLink: `https://drive.google.com/drive/folders/${folderId}`,
+                    fileId: folderId,
+                    fileType: 'other',
+                    selected: true
+                });
+            }
+
+            noteBatchFilesCache = fetchedFiles;
+            renderNoteBatchList();
+            status.classList.add('hidden');
+            fetchBtn.disabled = false;
+            fetchBtn.classList.remove('opacity-50');
+        }
+
+        function renderNoteBatchList() {
+            const container = document.getElementById('note-batch-results');
+            const saveBtn = document.getElementById('btn-save-note-batch');
+            const countSpan = document.getElementById('note-batch-count');
+
+            if (noteBatchFilesCache.length === 0) {
+                container.classList.add('hidden');
+                saveBtn.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            saveBtn.classList.remove('hidden');
+            
+            const selectedCount = noteBatchFilesCache.filter(v => v.selected).length;
+            countSpan.textContent = selectedCount;
+
+            container.innerHTML = noteBatchFilesCache.map((n, index) => {
+                const typeInfo = getNoteTypeInfo(n.fileType || 'other');
+                return `
+                <div class="flex items-center gap-3 bg-white/40 p-3 rounded-xl border border-white/60 transition hover:bg-white/60">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${typeInfo.iconClass} border border-white/10 shadow-sm">
+                        <i class="fa-solid ${typeInfo.icon}"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-slate-700 line-clamp-2">${n.title}</p>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">${typeInfo.label}</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button onclick="toggleNoteBatchSelection(${index})" 
+                            class="w-6 h-6 flex items-center justify-center rounded-md border-2 transition ${n.selected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 text-transparent'}">
+                            <i class="fa-solid fa-check text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function toggleNoteBatchSelection(index) {
+            noteBatchFilesCache[index].selected = !noteBatchFilesCache[index].selected;
+            renderNoteBatchList();
+        }
+
+        async function saveBatchNotes() {
+            const subject = document.getElementById('note-batch-subject').value;
+            const selected = noteBatchFilesCache.filter(v => v.selected);
+            
+            if (selected.length === 0) {
+                alert("Please select at least one note to import.");
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            let baseId = Date.now();
+            
+            for (let i = 0; i < selected.length; i++) {
+                const n = selected[i];
+                const noteItem = {
+                    id: baseId + i,
+                    title: n.title,
+                    driveLink: n.driveLink,
+                    fileId: n.fileId,
+                    fileType: n.fileType,
+                    subject: subject,
+                    date: today
+                };
+                
+                notes.push(noteItem);
+                await saveSupabaseItem('notes', noteItem);
+            }
+
+            // Reset UI
+            document.getElementById('batch-folder-url').value = '';
+            noteBatchFilesCache = [];
+            document.getElementById('note-batch-results').innerHTML = '';
+            document.getElementById('note-batch-results').classList.add('hidden');
+            document.getElementById('btn-save-note-batch').classList.add('hidden');
+
+            renderNotes();
+            closeModal('note-modal');
         }
 
         function editNoteModal(id) {
@@ -2465,12 +3020,275 @@
         }
 
         // VIDEOS CRUD
+        let playlistVideosCache = [];
+
         function openVideoModal() {
             document.getElementById('video-id').value = '';
             document.getElementById('video-form').reset();
             document.getElementById('video-modal-title').innerText = "Add Lecture Video";
             document.getElementById('video-fetch-preview').classList.add('hidden');
+            document.getElementById('batch-results-container').classList.add('hidden');
+            document.getElementById('batch-results-container').innerHTML = '';
+            document.getElementById('btn-save-batch').classList.add('hidden');
+            document.getElementById('batch-status').classList.add('hidden');
+            document.getElementById('batch-playlist-url').value = '';
+            setVideoMode('single');
             openModal('video-modal');
+        }
+
+        function setVideoMode(mode) {
+            const singleBtn = document.getElementById('btn-single-mode');
+            const batchBtn = document.getElementById('btn-batch-mode');
+            const singleContent = document.getElementById('single-mode-content');
+            const batchContent = document.getElementById('batch-mode-content');
+
+            if (mode === 'single') {
+                singleBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all";
+                batchBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 transition-all hover:text-slate-700";
+                singleContent.classList.remove('hidden');
+                batchContent.classList.add('hidden');
+            } else {
+                batchBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all";
+                singleBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-500 transition-all hover:text-slate-700";
+                batchContent.classList.remove('hidden');
+                singleContent.classList.add('hidden');
+            }
+        }
+
+        function extractPlaylistId(url) {
+            const match = url.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+            return match ? match[1] : null;
+        }
+
+        async function fetchPlaylist() {
+            const url = document.getElementById('batch-playlist-url').value.trim();
+            const playlistId = extractPlaylistId(url);
+            const status = document.getElementById('batch-status');
+            const resultsContainer = document.getElementById('batch-results-container');
+            const fetchBtn = document.getElementById('btn-fetch-playlist');
+            
+            if (!playlistId) {
+                status.textContent = "Invalid playlist URL. Please paste a full YouTube Playlist link.";
+                status.classList.remove('hidden');
+                return;
+            }
+
+            status.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Scanning playlist (supports unlisted)...';
+            status.classList.remove('hidden');
+            status.className = "text-2xs text-indigo-600 mt-1.5";
+            fetchBtn.disabled = true;
+            fetchBtn.classList.add('opacity-50');
+
+            // Strategy 1: Scrape the Playlist page (works for Unlisted playlists)
+            const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
+            const proxies = [
+                `https://api.allorigins.win/get?url=${encodeURIComponent(playlistUrl)}`,
+                `https://corsproxy.io/?${encodeURIComponent(playlistUrl)}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(playlistUrl)}`
+            ];
+
+            let fetchedVideos = [];
+            
+            for (let i = 0; i < proxies.length; i++) {
+                try {
+                    const response = await fetch(proxies[i], { signal: AbortSignal.timeout(10000) });
+                    if (!response.ok) continue;
+
+                    let html;
+                    if (proxies[i].includes('allorigins')) {
+                        const json = await response.json();
+                        html = json.contents;
+                    } else {
+                        html = await response.text();
+                    }
+
+                    if (!html) continue;
+
+                    // Extract ytInitialData JSON
+                    const regex = /ytInitialData\s*=\s*({.+?});/s;
+                    const match = html.match(regex);
+                    
+                    if (match && match[1]) {
+                        const parsedData = JSON.parse(match[1]);
+                        
+                        // Recursive traversal to find all video IDs and titles
+                        const foundVideos = [];
+                        const seenIds = new Set();
+                        
+                        function traverse(obj) {
+                            if (!obj || typeof obj !== 'object') return;
+                            
+                            // Check if this object is a playlist video item
+                            if (obj.playlistVideoRenderer && obj.playlistVideoRenderer.videoId) {
+                                const item = obj.playlistVideoRenderer;
+                                const vId = item.videoId;
+                                let vTitle = 'Untitled Video';
+                                
+                                if (item.title && item.title.runs && item.title.runs[0]) {
+                                    vTitle = item.title.runs[0].text;
+                                } else if (item.title && item.title.simpleText) {
+                                    vTitle = item.title.simpleText;
+                                }
+                                
+                                if (!seenIds.has(vId)) {
+                                    seenIds.add(vId);
+                                    foundVideos.push({
+                                        id: Date.now() + Math.random().toString(36).substr(2, 5),
+                                        title: vTitle,
+                                        url: `https://www.youtube.com/watch?v=${vId}`,
+                                        videoId: vId,
+                                        selected: true
+                                    });
+                                }
+                            }
+                            
+                            // Standard video renderer fallback
+                            if (obj.videoId && !seenIds.has(obj.videoId) && (obj.title?.runs?.[0]?.text || obj.title?.simpleText)) {
+                                const vId = obj.videoId;
+                                const vTitle = obj.title.runs?.[0]?.text || obj.title.simpleText;
+                                seenIds.add(vId);
+                                foundVideos.push({
+                                    id: Date.now() + Math.random().toString(36).substr(2, 5),
+                                    title: vTitle,
+                                    url: `https://www.youtube.com/watch?v=${vId}`,
+                                    videoId: vId,
+                                    selected: true
+                                });
+                            }
+
+                            // Keep looking deeper
+                            for (const key in obj) {
+                                if (obj.hasOwnProperty(key)) traverse(obj[key]);
+                            }
+                        }
+
+                        traverse(parsedData);
+                        
+                        if (foundVideos.length > 0) {
+                            fetchedVideos = foundVideos;
+                            break; // Successfully parsed!
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`Proxy ${i} failed or timed out:`, err);
+                }
+            }
+
+            // Strategy 2: Fallback to RSS Feed (Only works for Public playlists)
+            if (fetchedVideos.length === 0) {
+                try {
+                    console.log('🔄 Scraping failed, trying RSS feed fallback...');
+                    const rssUrl = `https://api.rss2json.com/v1/api.json?rss_url=https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`;
+                    const response = await fetch(rssUrl);
+                    const data = await response.json();
+
+                    if (data.status === 'ok' && data.items && data.items.length > 0) {
+                        fetchedVideos = data.items.map(item => {
+                            const videoId = item.link.includes('v=') ? item.link.split('v=')[1] : '';
+                            return {
+                                id: Date.now() + Math.random().toString(36).substr(2, 5),
+                                title: item.title,
+                                url: item.link,
+                                videoId: videoId,
+                                selected: true
+                            };
+                        });
+                    }
+                } catch (e) {
+                    console.error('RSS Fallback failed:', e);
+                }
+            }
+
+            // Final Evaluation
+            if (fetchedVideos.length > 0) {
+                playlistVideosCache = fetchedVideos;
+                renderBatchList();
+                status.classList.add('hidden');
+            } else {
+                status.textContent = "Could not retrieve videos. Ensure the playlist is either Public or Unlisted, and try again.";
+                status.className = "text-2xs text-rose-600 mt-1.5";
+            }
+
+            fetchBtn.disabled = false;
+            fetchBtn.classList.remove('opacity-50');
+        }
+
+        function renderBatchList() {
+            const container = document.getElementById('batch-results-container');
+            const saveBtn = document.getElementById('btn-save-batch');
+            const countSpan = document.getElementById('batch-count');
+
+            if (playlistVideosCache.length === 0) {
+                container.classList.add('hidden');
+                saveBtn.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            saveBtn.classList.remove('hidden');
+            
+            const selectedCount = playlistVideosCache.filter(v => v.selected).length;
+            countSpan.textContent = selectedCount;
+
+            container.innerHTML = playlistVideosCache.map((v, index) => `
+                <div class="flex items-center gap-3 bg-white/40 p-3 rounded-xl border border-white/60 transition hover:bg-white/60">
+                    <div class="flex-shrink-0">
+                        <img src="https://img.youtube.com/vi/${v.videoId}/default.jpg" class="w-16 h-9 rounded-md object-cover bg-slate-200" alt="Thumb">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-slate-700 line-clamp-2">${v.title}</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button onclick="toggleBatchVideoSelection(${index})" 
+                            class="w-6 h-6 flex items-center justify-center rounded-md border-2 transition ${v.selected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 text-transparent'}">
+                            <i class="fa-solid fa-check text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleBatchVideoSelection(index) {
+            playlistVideosCache[index].selected = !playlistVideosCache[index].selected;
+            renderBatchList();
+        }
+
+        async function saveBatchVideos() {
+            const subject = document.getElementById('video-subject').value;
+            const selected = playlistVideosCache.filter(v => v.selected);
+            
+            if (selected.length === 0) {
+                alert("Please select at least one video.");
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            let baseId = Date.now();
+            
+            for (let i = 0; i < selected.length; i++) {
+                const v = selected[i];
+                const videoItem = {
+                    id: baseId + i,
+                    title: v.title,
+                    url: v.url,
+                    videoId: v.videoId,
+                    subject: subject,
+                    date: today
+                };
+                
+                videos.push(videoItem);
+                await saveSupabaseItem('videos', videoItem);
+            }
+
+            // Reset UI
+            document.getElementById('batch-playlist-url').value = '';
+            playlistVideosCache = [];
+            document.getElementById('batch-results-container').innerHTML = '';
+            document.getElementById('batch-results-container').classList.add('hidden');
+            document.getElementById('btn-save-batch').classList.add('hidden');
+
+            renderVideos();
+            closeModal('video-modal');
         }
 
         function editVideoModal(id) {
