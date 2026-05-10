@@ -459,51 +459,136 @@
             <!-- Focus & Streak Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
-                <!-- Focus Timer (Pomodoro) -->
-                <div class="glass-panel p-6 rounded-3xl border border-white/50 flex flex-col justify-between items-center text-center relative overflow-hidden">
-                    <div class="absolute -right-12 -top-12 w-32 h-32 bg-indigo-200/40 rounded-full blur-2xl"></div>
+                <!-- Focus Timer (Pomodoro) — Fully Redesigned -->
+                <div class="glass-panel p-5 rounded-3xl border border-white/50 flex flex-col relative overflow-hidden">
+                    <div class="absolute -right-12 -top-12 w-36 h-36 bg-indigo-200/40 rounded-full blur-2xl"></div>
                     <div class="absolute -left-12 -bottom-12 w-32 h-32 bg-purple-200/40 rounded-full blur-2xl"></div>
-                    
-                    <div class="w-full flex justify-between items-center mb-4 relative z-10">
-                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Focus Mode</span>
-                        <div class="flex space-x-1">
-                            <button onclick="setTimerType('work')" id="btn-timer-work" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-600 text-white shadow-sm transition-all">Work</button>
-                            <button onclick="setTimerType('break')" id="btn-timer-break" class="text-xs font-semibold px-2.5 py-1 rounded-full text-slate-600 hover:bg-white/60 transition-all">Break</button>
+
+                    <!-- Header row -->
+                    <div class="flex justify-between items-center mb-3 relative z-10">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 flex items-center gap-1.5">
+                            <i class="fa-solid fa-brain text-indigo-500"></i> Focus Mode
+                        </span>
+                        <!-- Settings gear -->
+                        <button onclick="toggleFocusSettings()" class="text-slate-400 hover:text-indigo-600 cursor-pointer p-1 rounded-lg hover:bg-indigo-50 transition" title="Timer Settings">
+                            <i class="fa-solid fa-sliders text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Session Type Tabs -->
+                    <div class="flex items-center p-1 bg-slate-100/70 rounded-xl mb-4 relative z-10">
+                        <button onclick="setTimerType('work')" id="btn-timer-work" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-indigo-700 shadow-sm transition-all cursor-pointer">Work</button>
+                        <button onclick="setTimerType('short')" id="btn-timer-short" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-500 transition-all cursor-pointer">Short</button>
+                        <button onclick="setTimerType('break')" id="btn-timer-break" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-500 transition-all cursor-pointer">Long</button>
+                    </div>
+
+                    <!-- Ring Timer Display -->
+                    <div class="relative z-10 flex items-center justify-center my-2">
+                        <svg class="w-36 h-36 -rotate-90" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="52" fill="none" stroke="#e0e7ff" stroke-width="8"/>
+                            <circle id="timer-ring" cx="60" cy="60" r="52" fill="none" stroke="#6366f1" stroke-width="8"
+                                stroke-linecap="round"
+                                stroke-dasharray="326.7"
+                                stroke-dashoffset="0"
+                                class="transition-all duration-1000 ease-linear"/>
+                        </svg>
+                        <div class="absolute flex flex-col items-center justify-center">
+                            <h2 id="timer-display" class="text-3xl font-extrabold text-slate-800 tracking-tight">25:00</h2>
+                            <span id="timer-mode-label" class="text-[10px] font-semibold text-indigo-500 uppercase tracking-wider mt-0.5">Focus</span>
                         </div>
                     </div>
 
-                    <div id="timer-display-container" class="relative z-10 my-6 transition-all duration-300">
-                        <h2 id="timer-display" class="text-5xl font-bold text-slate-800 tracking-tight">25:00</h2>
+                    <!-- Session Counter -->
+                    <div class="flex justify-center gap-1.5 mb-3 relative z-10">
+                        <div id="session-dots" class="flex gap-1.5">
+                            <div class="w-2 h-2 rounded-full bg-indigo-600"></div>
+                            <div class="w-2 h-2 rounded-full bg-slate-200"></div>
+                            <div class="w-2 h-2 rounded-full bg-slate-200"></div>
+                            <div class="w-2 h-2 rounded-full bg-slate-200"></div>
+                        </div>
                     </div>
 
-                    <div class="flex space-x-3 relative z-10 w-full">
-                        <button id="timer-start" onclick="toggleTimer()" class="w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md hover:shadow-indigo-500/20 transition duration-200 cursor-pointer">
-                            <i class="fa-solid fa-play mr-2"></i> Start
+                    <!-- Controls -->
+                    <div class="flex items-center gap-2 relative z-10">
+                        <button onclick="skipTimer()" class="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 text-xs transition cursor-pointer" title="Skip">
+                            <i class="fa-solid fa-forward-step"></i>
                         </button>
-                        <button onclick="resetTimer()" class="py-3 px-4 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-sm transition duration-200 cursor-pointer">
+                        <button id="timer-start" onclick="toggleTimer()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md transition cursor-pointer flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play" id="timer-play-icon"></i> <span id="timer-btn-label">Start</span>
+                        </button>
+                        <button onclick="resetTimer()" class="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 text-xs transition cursor-pointer" title="Reset">
                             <i class="fa-solid fa-arrow-rotate-left"></i>
                         </button>
                     </div>
+
+                    <!-- Focus Settings Panel (collapsible) -->
+                    <div id="focus-settings-panel" class="hidden mt-4 pt-4 border-t border-slate-200/60 space-y-3 relative z-10">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Timer Settings (mins)</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] font-semibold text-slate-500 block mb-1">Work</label>
+                                <input type="number" id="setting-work-mins" value="25" min="1" max="90" onchange="applyTimerSettings()" class="w-full px-2 py-1.5 bg-white/80 border border-slate-200 rounded-lg text-xs text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-semibold text-slate-500 block mb-1">Short</label>
+                                <input type="number" id="setting-short-mins" value="5" min="1" max="30" onchange="applyTimerSettings()" class="w-full px-2 py-1.5 bg-white/80 border border-slate-200 rounded-lg text-xs text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-semibold text-slate-500 block mb-1">Long</label>
+                                <input type="number" id="setting-break-mins" value="15" min="1" max="60" onchange="applyTimerSettings()" class="w-full px-2 py-1.5 bg-white/80 border border-slate-200 rounded-lg text-xs text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-[10px] font-semibold text-slate-500">Auto-switch after session</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="setting-autoswitch" class="sr-only peer" checked>
+                                <div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Streak Tracker -->
-                <div class="glass-panel p-6 rounded-3xl border border-white/50 flex flex-col justify-between relative overflow-hidden">
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-100/40 rounded-full blur-xl"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Daily Streak</span>
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">Active</span>
-                        </div>
-                        <div class="flex items-baseline space-x-2">
-                            <span id="streak-count" class="text-6xl font-extrabold text-slate-800">5</span>
-                            <span class="text-lg font-medium text-slate-500">Days</span>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-2">Study every day to keep your streak going!</p>
+                <!-- Daily Streak — Fully Functional -->
+                <div class="glass-panel p-5 rounded-3xl border border-white/50 flex flex-col relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-amber-100/50 rounded-full blur-xl"></div>
+                    
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 flex items-center gap-1.5">
+                            <i class="fa-solid fa-fire text-amber-500"></i> Daily Streak
+                        </span>
+                        <span id="streak-status-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">Active</span>
                     </div>
 
-                    <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-200/50">
-                        <span class="text-xs font-semibold text-slate-600">Total Study Hours:</span>
-                        <span id="total-hours" class="text-sm font-bold text-slate-800">14.2h</span>
+                    <!-- Streak Count Big Display -->
+                    <div class="flex items-baseline gap-2 mb-1">
+                        <span id="streak-count" class="text-6xl font-extrabold text-slate-800">0</span>
+                        <span class="text-lg font-medium text-slate-500">Days</span>
+                    </div>
+
+                    <!-- Last studied info -->
+                    <p id="streak-last-info" class="text-[11px] text-slate-400 font-medium mb-3">Start studying to build your streak!</p>
+
+                    <!-- Weekly dots: each circle = a day of current week -->
+                    <div class="flex justify-between items-center gap-1 mb-3">
+                        <div id="streak-weekly-dots" class="flex gap-1.5 w-full">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Best streak & hours row -->
+                    <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-200/50">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">Best Streak</p>
+                            <p id="best-streak" class="text-base font-extrabold text-amber-600">0 days</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">Study Today</p>
+                            <p id="today-hours" class="text-base font-extrabold text-indigo-600">0h</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-3 pt-3 border-t border-slate-200/50">
+                        <span class="text-xs font-semibold text-slate-500">Total Hours</span>
+                        <span id="total-hours" class="text-sm font-bold text-slate-800">0h</span>
                     </div>
                 </div>
 
@@ -512,16 +597,26 @@
                     <div class="absolute -left-6 -top-6 w-24 h-24 bg-pink-100/40 rounded-full blur-xl"></div>
                     <div>
                         <span class="text-xs font-bold uppercase tracking-wider text-pink-600">Overview</span>
-                        <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div class="grid grid-cols-2 gap-3 mt-4">
                             <div class="bg-white/40 p-3 rounded-2xl border border-white/60">
                                 <span class="text-xs font-medium text-slate-400 block">Pending</span>
                                 <span id="stat-pending-tasks" class="text-2xl font-bold text-slate-800">3</span>
                                 <span class="text-2xs text-indigo-600 block mt-1">ToDos left</span>
                             </div>
                             <div class="bg-white/40 p-3 rounded-2xl border border-white/60">
+                                <span class="text-xs font-medium text-slate-400 block">Library</span>
+                                <span id="stat-books-count" class="text-2xl font-bold text-slate-800">0</span>
+                                <span class="text-2xs text-amber-600 block mt-1">Books reading</span>
+                            </div>
+                            <div class="bg-white/40 p-3 rounded-2xl border border-white/60">
+                                <span class="text-xs font-medium text-slate-400 block">Syllabus</span>
+                                <span id="stat-syllabus-progress" class="text-2xl font-bold text-slate-800">0%</span>
+                                <span class="text-2xs text-purple-600 block mt-1">Completed</span>
+                            </div>
+                            <div class="bg-white/40 p-3 rounded-2xl border border-white/60">
                                 <span class="text-xs font-medium text-slate-400 block">Lectures</span>
                                 <span id="stat-videos-count" class="text-2xl font-bold text-slate-800">8</span>
-                                <span class="text-2xs text-purple-600 block mt-1">Videos tracked</span>
+                                <span class="text-2xs text-rose-600 block mt-1">Videos tracked</span>
                             </div>
                         </div>
                     </div>
@@ -559,30 +654,69 @@
             </div>
         </section>
 
-        <!-- TODOS TAB -->
+        <!-- TODOS TAB (Redesigned with sub-tabs) -->
         <section id="content-todos" class="tab-content hidden space-y-6">
-            <div class="flex justify-between items-center flex-wrap gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800">Tasks & Reminders</h2>
-                    <p class="text-xs text-slate-500">Stay on top of assignments, homework and alerts</p>
-                </div>
-                <!-- Add Task Button -->
-                <button onclick="openModal('todo-modal')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md flex items-center space-x-2 transition cursor-pointer">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Add Task</span>
+            <!-- Sub-Tab Navigation -->
+            <div class="flex items-center p-1 bg-slate-100 rounded-xl">
+                <button onclick="setTodoSubTab('tasks')" id="todo-subtab-tasks" class="flex-1 py-2.5 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-check-double"></i> Tasks
+                </button>
+                <button onclick="setTodoSubTab('library')" id="todo-subtab-library" class="flex-1 py-2.5 text-xs font-bold rounded-lg text-slate-500 transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:text-slate-700">
+                    <i class="fa-solid fa-book"></i> Library
+                </button>
+                <button onclick="setTodoSubTab('syllabus')" id="todo-subtab-syllabus" class="flex-1 py-2.5 text-xs font-bold rounded-lg text-slate-500 transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:text-slate-700">
+                    <i class="fa-solid fa-graduation-cap"></i> Syllabus
                 </button>
             </div>
 
-            <!-- Task Filters -->
-            <div class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="filterTodos('all')" id="todo-filter-all" class="todo-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-600 text-white cursor-pointer">All</button>
-                <button onclick="filterTodos('pending')" id="todo-filter-pending" class="todo-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 bg-white/40 border border-slate-200 hover:bg-white/80 cursor-pointer">Pending</button>
-                <button onclick="filterTodos('completed')" id="todo-filter-completed" class="todo-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 bg-white/40 border border-slate-200 hover:bg-white/80 cursor-pointer">Completed</button>
+            <!-- TASKS SUB-TAB -->
+            <div id="todo-tasks-content">
+                <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Tasks & Reminders</h2>
+                        <p class="text-xs text-slate-500">Stay on top of assignments, homework and alerts</p>
+                    </div>
+                    <button onclick="openModal('todo-modal')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-md flex items-center space-x-2 transition cursor-pointer">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Task</span>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar mb-4">
+                    <button onclick="filterTodos('all')" id="todo-filter-all" class="todo-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-600 text-white cursor-pointer">All</button>
+                    <button onclick="filterTodos('pending')" id="todo-filter-pending" class="todo-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 bg-white/40 border border-slate-200 hover:bg-white/80 cursor-pointer">Pending</button>
+                    <button onclick="filterTodos('completed')" id="todo-filter-completed" class="todo-filter-btn px-3.5 py-1.5 rounded-full text-xs font-bold text-slate-600 bg-white/40 border border-slate-200 hover:bg-white/80 cursor-pointer">Completed</button>
+                </div>
+                <div id="todo-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
-            <!-- Todos Grid/List -->
-            <div id="todo-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Dynamically populated -->
+            <!-- LIBRARY SUB-TAB -->
+            <div id="todo-library-content" class="hidden">
+                <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Reading Library</h2>
+                        <p class="text-xs text-slate-500">Track books you're reading across subjects</p>
+                    </div>
+                    <button onclick="openBookModal()" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm shadow-md flex items-center space-x-2 transition cursor-pointer">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Book</span>
+                    </button>
+                </div>
+                <div id="library-list-container" class="space-y-6"></div>
+            </div>
+
+            <!-- SYLLABUS SUB-TAB -->
+            <div id="todo-syllabus-content" class="hidden">
+                <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Syllabus Tracker</h2>
+                        <p class="text-xs text-slate-500">Track topic completion and revision count per subject</p>
+                    </div>
+                    <button onclick="openSyllabusModal()" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm shadow-md flex items-center space-x-2 transition cursor-pointer">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Topic</span>
+                    </button>
+                </div>
+                <div id="syllabus-list-container" class="space-y-6"></div>
             </div>
         </section>
 
@@ -603,6 +737,14 @@
             </div>
 
             <!-- Notes Grid -->
+            <div class="flex items-center gap-2 mb-4">
+                <select id="notes-sort-select" onchange="notesSortBy=this.value; renderNotes()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none cursor-pointer">
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="a-z">A → Z</option>
+                    <option value="z-a">Z → A</option>
+                </select>
+            </div>
             <div id="notes-grid-container" class="space-y-8">
                 <!-- Injected via JS -->
             </div>
@@ -619,6 +761,16 @@
                     <i class="fa-solid fa-plus"></i>
                     <span>Add Video</span>
                 </button>
+            </div>
+
+            <!-- Videos Sort -->
+            <div class="flex items-center gap-2 mb-4">
+                <select id="videos-sort-select" onchange="videosSortBy=this.value; renderVideos()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none cursor-pointer">
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="a-z">A → Z</option>
+                    <option value="z-a">Z → A</option>
+                </select>
             </div>
 
             <!-- Videos Grid -->
@@ -1147,6 +1299,127 @@
         </div>
     </div>
 
+    <!-- BOOK ADD MODAL -->
+    <div id="book-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-panel p-6 rounded-3xl max-w-lg w-full border border-white/60 animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                <h3 id="book-modal-title" class="text-base font-bold text-slate-800">Add Book</h3>
+                <button onclick="closeModal('book-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="saveBook(event)" class="space-y-3 flex-1 overflow-y-auto pr-1">
+                <input type="hidden" id="book-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Book Title</label>
+                        <input type="text" id="book-title" required placeholder="e.g. Organic Chemistry" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Author</label>
+                        <input type="text" id="book-author" required placeholder="e.g. Morrison & Boyd" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Subject</label>
+                        <select id="book-subject" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Status</label>
+                        <select id="book-status" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            <option value="not_started">Not Started</option>
+                            <option value="reading">Reading</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Total Pages</label>
+                        <input type="number" id="book-total-pages" placeholder="e.g. 350" min="1" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Pages Read</label>
+                        <input type="number" id="book-pages-read" placeholder="e.g. 120" min="0" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Deadline</label>
+                        <input type="date" id="book-deadline" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 block mb-1">Rating (after completion)</label>
+                    <div id="book-rating-stars" class="flex gap-1.5">
+                        <button type="button" onclick="setBookRating(1)" class="text-slate-300 hover:text-amber-500 text-lg cursor-pointer transition"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setBookRating(2)" class="text-slate-300 hover:text-amber-500 text-lg cursor-pointer transition"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setBookRating(3)" class="text-slate-300 hover:text-amber-500 text-lg cursor-pointer transition"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setBookRating(4)" class="text-slate-300 hover:text-amber-500 text-lg cursor-pointer transition"><i class="fa-solid fa-star"></i></button>
+                        <button type="button" onclick="setBookRating(5)" class="text-slate-300 hover:text-amber-500 text-lg cursor-pointer transition"><i class="fa-solid fa-star"></i></button>
+                    </div>
+                    <input type="hidden" id="book-rating" value="0">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 block mb-1">Notes / Thoughts</label>
+                    <textarea id="book-notes" rows="2" placeholder="Key takeaways, quotes, etc." class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-200"></textarea>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="book-favorite" class="rounded border-slate-300 text-amber-600 focus:ring-amber-500">
+                    <label for="book-favorite" class="text-xs font-semibold text-slate-600">Mark as Favorite</label>
+                </div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm shadow-md transition cursor-pointer mt-2">Save Book</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SYLLABUS ADD/EDIT MODAL — Enhanced -->
+    <div id="syllabus-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-panel p-6 rounded-3xl max-w-lg w-full border border-white/60 animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                <h3 id="syllabus-modal-title" class="text-base font-bold text-slate-800">Add Syllabus Topic</h3>
+                <button onclick="closeModal('syllabus-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="saveSyllabusTopic(event)" class="space-y-3 flex-1 overflow-y-auto pr-1">
+                <input type="hidden" id="syllabus-id">
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 block mb-1">Topic Name</label>
+                    <input type="text" id="syllabus-topic" required placeholder="e.g. নিউটনের সূত্র" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Subject</label>
+                        <select id="syllabus-subject" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Priority</label>
+                        <select id="syllabus-priority" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Est. Hours</label>
+                        <input type="number" id="syllabus-est-hours" placeholder="e.g. 3" min="0" step="0.5" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Chapter / Unit</label>
+                        <input type="text" id="syllabus-chapter" placeholder="e.g. Chapter 5" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-600 block mb-1">Deadline</label>
+                        <input type="date" id="syllabus-deadline" class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 block mb-1">Notes</label>
+                    <textarea id="syllabus-notes" rows="2" placeholder="Key concepts, weak areas..." class="w-full px-4 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm shadow-md transition cursor-pointer">Save Topic</button>
+            </form>
+        </div>
+    </div>
+
     <!-- SUBJECT ADD MODAL -->
     <div id="subject-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="glass-panel p-6 rounded-3xl max-w-xs w-full border border-white/60 animate-in fade-in zoom-in-95 duration-200">
@@ -1232,6 +1505,8 @@
         let currentFilterTodos = 'all';
         let currentFilterNotes = 'all';
         let currentFilterVideos = 'all';
+        let notesSortBy = 'newest';
+        let videosSortBy = 'newest';
 
         // --- SUPABASE CONFIGURATION ---
         const SUPABASE_URL = 'https://vmjcoenomgcqisxbvznh.supabase.co';
@@ -1318,7 +1593,38 @@
                     const videoOrderObj = metaData.find(m => m.key === 'videos_order');
                     if (videoOrderObj) videoOrder = JSON.parse(videoOrderObj.value);
 
+                    const lastDateObj = metaData.find(m => m.key === 'last_study_date');
+                    if (lastDateObj) lastStudyDate = lastDateObj.value;
+
+                    const weeklyObj = metaData.find(m => m.key === 'weekly_study_data');
+                    if (weeklyObj) weeklyStudyData = JSON.parse(weeklyObj.value);
+
+                    const bestStreakObj = metaData.find(m => m.key === 'best_streak');
+                    if (bestStreakObj) bestStreak = parseInt(bestStreakObj.value) || 0;
+
+                    const studiedDaysObj = metaData.find(m => m.key === 'studied_days_set');
+                    if (studiedDaysObj) studiedDaysSet = JSON.parse(studiedDaysObj.value);
+
+                    const today = new Date().toISOString().split('T')[0];
+                    todayStudyHours = (studiedDaysSet && studiedDaysSet[today]) ? studiedDaysSet[today] : 0;
+
                     console.log('✅ Loaded settings & custom ordering arrays');
+                }
+
+                // 6. Fetch Books
+                const { data: bookData, error: bookErr } = await supabaseClient.from('books').select('*');
+                if (bookErr) console.error('❌ Books error:', bookErr);
+                else if (bookData && bookData.length > 0) {
+                    books = bookData;
+                    console.log(`✅ Loaded ${bookData.length} books`);
+                }
+
+                // 7. Fetch Syllabus
+                const { data: sylData, error: sylErr } = await supabaseClient.from('syllabus').select('*');
+                if (sylErr) console.error('❌ Syllabus error:', sylErr);
+                else if (sylData && sylData.length > 0) {
+                    syllabusTopics = sylData;
+                    console.log(`✅ Loaded ${sylData.length} syllabus topics`);
                 }
             } catch (error) {
                 console.error("❌ Failed to load Supabase data:", error);
@@ -1347,7 +1653,10 @@
             // Re-sync UI
             updateAllCounters();
             renderAll();
-            
+            renderStreakUI();
+            setTimerType('work'); // Initialize timer display with correct settings
+            updateSessionDots();
+
             if (document.getElementById('setting-autorename')) {
                 document.getElementById('setting-autorename').checked = focusSettings.autoRename;
             }
@@ -1381,6 +1690,20 @@
         }
         function fromDbVideo(item) {
             return { id: item.id, title: item.title, url: item.url, videoId: item.video_id, subject: item.subject, date: item.date };
+        }
+
+        function toDbBook(item) {
+            return { id: item.id, title: item.title, author: item.author, subject: item.subject, deadline: item.deadline || '', status: item.status || 'not_started', total_pages: item.totalPages || 0, pages_read: item.pagesRead || 0, rating: item.rating || 0, notes: item.notes || '', favorite: item.favorite || false, completed: item.completed || false, date: item.date };
+        }
+        function fromDbBook(item) {
+            return { id: item.id, title: item.title, author: item.author, subject: item.subject, deadline: item.deadline, status: item.status, totalPages: item.total_pages, pagesRead: item.pages_read, rating: item.rating, notes: item.notes, favorite: item.favorite, completed: item.completed, date: item.date };
+        }
+
+        function toDbSyllabus(item) {
+            return { id: item.id, topic: item.topic, subject: item.subject, deadline: item.deadline || '', priority: item.priority || 'medium', est_hours: item.estHours || 0, chapter: item.chapter || '', notes: item.notes || '', completed: item.completed || false, revisions: item.revisions || 0, last_revised: item.lastRevised || '', date: item.date };
+        }
+        function fromDbSyllabus(item) {
+            return { id: item.id, topic: item.topic, subject: item.subject, deadline: item.deadline, priority: item.priority, estHours: item.est_hours, chapter: item.chapter, notes: item.notes, completed: item.completed, revisions: item.revisions, lastRevised: item.last_revised, date: item.date };
         }
 
         // Generic Save - maps camelCase to snake_case before saving
@@ -1580,87 +1903,212 @@
         }
 
         // --- POMODORO TIMER ---
+        // --- FOCUS TIMER: Full Redesign ---
+        function getTimerMinutes(type) {
+            if (type === 'work') return timerSettings.work;
+            if (type === 'short') return timerSettings.short;
+            if (type === 'break') return timerSettings.long;
+            return 25;
+        }
+
         function setTimerType(type) {
             timerType = type;
             isTimerRunning = false;
             clearInterval(timerInterval);
-            document.getElementById('timer-start').innerHTML = '<i class="fa-solid fa-play mr-2"></i> Start';
-            document.getElementById('timer-display-container').classList.remove('timer-active');
 
-            const workBtn = document.getElementById('btn-timer-work');
-            const breakBtn = document.getElementById('btn-timer-break');
+            const mins = getTimerMinutes(type);
+            timerDuration = mins * 60;
+            totalDuration = timerDuration;
 
-            if (type === 'work') {
-                timerDuration = 25 * 60;
-                workBtn.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-600 text-white shadow-sm transition-all";
-                breakBtn.className = "text-xs font-semibold px-2.5 py-1 rounded-full text-slate-600 hover:bg-white/60 transition-all";
-            } else {
-                timerDuration = 5 * 60;
-                breakBtn.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-600 text-white shadow-sm transition-all";
-                workBtn.className = "text-xs font-semibold px-2.5 py-1 rounded-full text-slate-600 hover:bg-white/60 transition-all";
-            }
+            // Update tabs styling
+            ['work','short','break'].forEach(t => {
+                const btn = document.getElementById(`btn-timer-${t}`);
+                if (!btn) return;
+                btn.className = t === type
+                    ? "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-indigo-700 shadow-sm transition-all cursor-pointer"
+                    : "flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-500 transition-all cursor-pointer";
+            });
+
+            // Mode label
+            const labels = { work: 'Focus', short: 'Short Break', break: 'Long Break' };
+            const modeLabel = document.getElementById('timer-mode-label');
+            if (modeLabel) modeLabel.innerText = labels[type] || 'Focus';
+
+            const playIcon = document.getElementById('timer-play-icon');
+            const btnLabel = document.getElementById('timer-btn-label');
+            if (playIcon) playIcon.className = 'fa-solid fa-play';
+            if (btnLabel) btnLabel.innerText = 'Start';
+
             updateTimerDisplay();
+            updateTimerRing();
         }
 
         function updateTimerDisplay() {
             const minutes = Math.floor(timerDuration / 60);
             const seconds = timerDuration % 60;
-            document.getElementById('timer-display').innerText = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const el = document.getElementById('timer-display');
+            if (el) el.innerText = display;
+            document.title = isTimerRunning ? `${display} — AeroStudy` : 'AeroStudy | 2026 Student Workstation';
+        }
+
+        function updateTimerRing() {
+            const ring = document.getElementById('timer-ring');
+            if (!ring || !totalDuration) return;
+            const circumference = 326.7;
+            const progress = timerDuration / totalDuration;
+            ring.style.strokeDashoffset = circumference * (1 - progress);
+            // Color by type
+            const colors = { work: '#6366f1', short: '#10b981', break: '#f59e0b' };
+            ring.style.stroke = colors[timerType] || '#6366f1';
+        }
+
+        function updateSessionDots() {
+            const dots = document.getElementById('session-dots');
+            if (!dots) return;
+            const n = Math.max(4, sessionCount + 1);
+            dots.innerHTML = Array.from({length: 4}, (_, i) =>
+                `<div class="w-2 h-2 rounded-full ${i < sessionCount ? 'bg-indigo-600' : 'bg-slate-200'} transition-all"></div>`
+            ).join('');
         }
 
         function toggleTimer() {
             if (isTimerRunning) {
-                // Pause
                 clearInterval(timerInterval);
                 isTimerRunning = false;
-                document.getElementById('timer-start').innerHTML = '<i class="fa-solid fa-play mr-2"></i> Resume';
-                document.getElementById('timer-display-container').classList.remove('timer-active');
+                const playIcon = document.getElementById('timer-play-icon');
+                const btnLabel = document.getElementById('timer-btn-label');
+                if (playIcon) playIcon.className = 'fa-solid fa-play';
+                if (btnLabel) btnLabel.innerText = 'Resume';
             } else {
-                // Play
                 isTimerRunning = true;
-                document.getElementById('timer-start').innerHTML = '<i class="fa-solid fa-pause mr-2"></i> Pause';
-                document.getElementById('timer-display-container').classList.add('timer-active');
+                const playIcon = document.getElementById('timer-play-icon');
+                const btnLabel = document.getElementById('timer-btn-label');
+                if (playIcon) playIcon.className = 'fa-solid fa-pause';
+                if (btnLabel) btnLabel.innerText = 'Pause';
                 
                 timerInterval = setInterval(() => {
                     if (timerDuration > 0) {
                         timerDuration--;
                         updateTimerDisplay();
+                        updateTimerRing();
                     } else {
-                        // Timer finished
                         clearInterval(timerInterval);
                         isTimerRunning = false;
-                        document.getElementById('timer-display-container').classList.remove('timer-active');
-                        alert(timerType === 'work' ? "Focus session complete! Time for a break." : "Break complete! Time to focus.");
-                        
-                        if (timerType === 'work') {
-                            totalStudyHours = parseFloat((totalStudyHours + 0.4).toFixed(1));
-                            // Save to Supabase
-                            saveSupabaseItem('settings', {
-                                key: 'study_hours',
-                                value: totalStudyHours.toString()
-                            });
-                            updateAllCounters();
-                            // Update Chart
-                            if(productivityChart) {
-                                productivityChart.data.datasets[0].data[6] += 0.4;
-                                productivityChart.update();
-                            }
-                        }
-                        setTimerType(timerType === 'work' ? 'break' : 'work');
+                        handleTimerComplete();
                     }
                 }, 1000);
             }
         }
 
-        function resetTimer() {
-            setTimerType(timerType);
+        async function handleTimerComplete() {
+            updateTimerDisplay();
+            updateTimerRing();
+            const playIcon = document.getElementById('timer-play-icon');
+            const btnLabel = document.getElementById('timer-btn-label');
+            if (playIcon) playIcon.className = 'fa-solid fa-play';
+            if (btnLabel) btnLabel.innerText = 'Start';
+
+            if (timerType === 'work') {
+                sessionCount = (sessionCount + 1) % 5;
+                updateSessionDots();
+                const workMins = timerSettings.work;
+                await recordStudySession(workMins / 60);
+                playNotificationSound('complete');
+
+                // Auto-switch
+                if (timerSettings.autoSwitch) {
+                    const nextType = sessionCount !== 0 ? 'short' : 'break';
+                    setTimerType(nextType);
+                    if (document.getElementById('setting-autoswitch')?.checked) toggleTimer();
+                } else {
+                    setTimerType('short');
+                }
+            } else {
+                playNotificationSound('ding');
+                if (timerSettings.autoSwitch) {
+                    setTimerType('work');
+                    if (document.getElementById('setting-autoswitch')?.checked) toggleTimer();
+                } else {
+                    setTimerType('work');
+                }
+            }
         }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            const mins = getTimerMinutes(timerType);
+            timerDuration = mins * 60;
+            totalDuration = timerDuration;
+            const playIcon = document.getElementById('timer-play-icon');
+            const btnLabel = document.getElementById('timer-btn-label');
+            if (playIcon) playIcon.className = 'fa-solid fa-play';
+            if (btnLabel) btnLabel.innerText = 'Start';
+            document.title = 'AeroStudy | 2026 Student Workstation';
+            updateTimerDisplay();
+            updateTimerRing();
+        }
+
+        function skipTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            handleTimerComplete();
+        }
+
+        function toggleFocusSettings() {
+            const panel = document.getElementById('focus-settings-panel');
+            if (panel) panel.classList.toggle('hidden');
+        }
+
+        function applyTimerSettings() {
+            timerSettings.work = parseInt(document.getElementById('setting-work-mins')?.value) || 25;
+            timerSettings.short = parseInt(document.getElementById('setting-short-mins')?.value) || 5;
+            timerSettings.long = parseInt(document.getElementById('setting-break-mins')?.value) || 15;
+            timerSettings.autoSwitch = document.getElementById('setting-autoswitch')?.checked ?? true;
+            setTimerType(timerType); // Re-init with new settings
+        }
+
+        function playNotificationSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = type === 'complete' ? 880 : 660;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.8);
+            } catch(e) {}
+        }
+
+        // updateTimerDisplay is called by setTimerType on init
+
+        // --- LIBRARY & SYLLABUS STATE ---
+        let books = [];
+        let syllabusTopics = [];
+        let weeklyStudyData = [0,0,0,0,0,0,0]; // Mon-Sun
+        let currentTodoSubTab = 'tasks';
+        let lastStudyDate = '';
+        let bestStreak = 0;
+        let todayStudyHours = 0;
+        let studiedDaysSet = {}; // { 'YYYY-MM-DD': hoursStudied }
+
+        // Timer settings (customizable)
+        let timerSettings = { work: 25, short: 5, long: 15, autoSwitch: true };
+        let sessionCount = 0;
+        let totalDuration = 25 * 60;
 
         // --- STATS COUNTERS & CHART ---
         function updateAllCounters() {
-            document.getElementById('streak-count').innerText = studyStreak;
-            document.getElementById('total-hours').innerText = totalStudyHours + 'h';
+            // Streak — update display
+            const streakEl = document.getElementById('streak-count');
+            if (streakEl) streakEl.innerText = studyStreak;
+            const totalHrsEl = document.getElementById('total-hours');
+            if (totalHrsEl) totalHrsEl.innerText = parseFloat(totalStudyHours).toFixed(1) + 'h';
             
             const pending = todos.filter(t => !t.completed).length;
             const pendingEl = document.getElementById('stat-pending-tasks');
@@ -1668,6 +2116,680 @@
             
             const videosEl = document.getElementById('stat-videos-count');
             if (videosEl) videosEl.innerText = videos.length;
+
+            // Books
+            const booksEl = document.getElementById('stat-books-count');
+            if (booksEl) booksEl.innerText = books.filter(b => !b.completed).length;
+
+            // Syllabus progress
+            const syllabusEl = document.getElementById('stat-syllabus-progress');
+            if (syllabusEl) {
+                const total = syllabusTopics.length;
+                const done = syllabusTopics.filter(s => s.completed).length;
+                syllabusEl.innerText = total > 0 ? Math.round((done / total) * 100) + '%' : '0%';
+            }
+        }
+
+        // --- STREAK LOGIC — FULLY FUNCTIONAL ---
+        // Dummy no-op for double-definition safety
+        function checkAndUpdateStreak() {
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            
+            if (!lastStudyDate || lastStudyDate === today) {
+                // No change needed
+            } else if (lastStudyDate === yesterday) {
+                // Good, streak continues (counted when studying)
+            } else {
+                // Missed a day — break the streak
+                studyStreak = 0;
+            }
+
+            // Update best streak
+            if (studyStreak > bestStreak) bestStreak = studyStreak;
+
+            renderStreakUI();
+        }
+
+        function renderStreakUI() {
+            const today = new Date().toISOString().split('T')[0];
+
+            // Status badge
+            const badge = document.getElementById('streak-status-badge');
+            if (badge) {
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                const active = lastStudyDate === today || lastStudyDate === yesterday;
+                badge.innerHTML = active
+                    ? `<i class="fa-solid fa-fire-flame-curved mr-1"></i> Active`
+                    : `<i class="fa-solid fa-circle-xmark mr-1"></i> Inactive`;
+                badge.className = `px-2.5 py-1 rounded-full text-xs font-semibold border ${active ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`;
+            }
+
+            // Last studied info
+            const infoEl = document.getElementById('streak-last-info');
+            if (infoEl) {
+                if (!lastStudyDate) {
+                    infoEl.innerText = "Start a Pomodoro session to begin your streak!";
+                } else if (lastStudyDate === today) {
+                    infoEl.innerText = `✅ You studied today! Keep it going.`;
+                } else {
+                    const days = Math.floor((Date.now() - new Date(lastStudyDate).getTime()) / 86400000);
+                    infoEl.innerText = days === 1 ? "⚠️ Study today to keep your streak!" : `❌ Streak broken! Last study was ${days} days ago.`;
+                }
+            }
+
+            // Weekly dots (Mon–Sun)
+            const dotsEl = document.getElementById('streak-weekly-dots');
+            if (dotsEl) {
+                const days = ['M','T','W','T','F','S','S'];
+                const now = new Date();
+                const currentDay = now.getDay(); // 0=Sun
+                dotsEl.innerHTML = days.map((label, i) => {
+                    const dayOffset = i - (currentDay === 0 ? 6 : currentDay - 1);
+                    const d = new Date(Date.now() + dayOffset * 86400000).toISOString().split('T')[0];
+                    const studied = studiedDaysSet && studiedDaysSet[d] > 0;
+                    const isToday = d === today;
+                    return `<div class="flex flex-col items-center flex-1 gap-1">
+                        <div class="w-full h-1.5 rounded-full ${studied ? 'bg-amber-500' : isToday ? 'bg-indigo-200' : 'bg-slate-200'}"></div>
+                        <span class="text-[9px] font-bold ${isToday ? 'text-indigo-600' : 'text-slate-400'}">${label}</span>
+                    </div>`;
+                }).join('');
+            }
+
+            // Best streak & today hours
+            const bestEl = document.getElementById('best-streak');
+            if (bestEl) bestEl.innerText = bestStreak + ' days';
+            const todayEl = document.getElementById('today-hours');
+            if (todayEl) todayEl.innerText = (studiedDaysSet?.[today] || 0).toFixed(1) + 'h';
+        }
+
+        async function recordStudySession(hours) {
+            const today = new Date().toISOString().split('T')[0];
+            const dayIndex = new Date().getDay(); // 0=Sun, 1=Mon...
+            const chartIndex = dayIndex === 0 ? 6 : dayIndex - 1; // Mon=0
+
+            // Update totals
+            totalStudyHours = parseFloat((totalStudyHours + hours).toFixed(2));
+            weeklyStudyData[chartIndex] = parseFloat((weeklyStudyData[chartIndex] + hours).toFixed(2));
+
+            // Track per-day hours
+            if (!studiedDaysSet) studiedDaysSet = {};
+            studiedDaysSet[today] = parseFloat(((studiedDaysSet[today] || 0) + hours).toFixed(2));
+            todayStudyHours = studiedDaysSet[today];
+
+            // Streak logic
+            if (lastStudyDate !== today) {
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                if (!lastStudyDate || lastStudyDate === yesterday) {
+                    studyStreak++;
+                } else {
+                    studyStreak = 1; // Reset but count today
+                }
+                lastStudyDate = today;
+            }
+
+            // Best streak update
+            if (studyStreak > bestStreak) bestStreak = studyStreak;
+
+            // Update chart live
+            if (productivityChart) {
+                productivityChart.data.datasets[0].data = [...weeklyStudyData];
+                productivityChart.update();
+            }
+
+            // Save everything to Supabase
+            await saveSupabaseItem('settings', { key: 'study_hours', value: totalStudyHours.toString() });
+            await saveSupabaseItem('settings', { key: 'study_streak', value: studyStreak.toString() });
+            await saveSupabaseItem('settings', { key: 'best_streak', value: bestStreak.toString() });
+            await saveSupabaseItem('settings', { key: 'last_study_date', value: lastStudyDate });
+            await saveSupabaseItem('settings', { key: 'weekly_study_data', value: JSON.stringify(weeklyStudyData) });
+            await saveSupabaseItem('settings', { key: 'studied_days_set', value: JSON.stringify(studiedDaysSet) });
+
+            updateAllCounters();
+            renderStreakUI();
+        }
+
+        // --- TODO SUB-TAB SWITCHING ---
+        function setTodoSubTab(tab) {
+            currentTodoSubTab = tab;
+            const tabs = ['tasks', 'library', 'syllabus'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`todo-subtab-${t}`);
+                const content = document.getElementById(`todo-${t}-content`);
+                if (t === tab) {
+                    btn.className = "flex-1 py-2.5 text-xs font-bold rounded-lg bg-white text-slate-700 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer";
+                    content.classList.remove('hidden');
+                } else {
+                    btn.className = "flex-1 py-2.5 text-xs font-bold rounded-lg text-slate-500 transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:text-slate-700";
+                    content.classList.add('hidden');
+                }
+            });
+            if (tab === 'library') renderLibrary();
+            if (tab === 'syllabus') renderSyllabus();
+        }
+
+        // ===================== LIBRARY SYSTEM (Enhanced) =====================
+        let librarySortBy = 'date';
+        let librarySearchVal = '';
+
+        function setBookRating(stars) {
+            document.getElementById('book-rating').value = stars;
+            const btns = document.getElementById('book-rating-stars').querySelectorAll('button i');
+            btns.forEach((icon, i) => {
+                icon.className = i < stars ? 'fa-solid fa-star text-amber-400' : 'fa-solid fa-star text-slate-300';
+            });
+        }
+
+        function openBookModal() {
+            document.getElementById('book-id').value = '';
+            document.getElementById('book-modal-title').innerText = 'Add Book';
+            document.getElementById('book-title').value = '';
+            document.getElementById('book-author').value = '';
+            document.getElementById('book-deadline').value = '';
+            document.getElementById('book-status').value = 'not_started';
+            document.getElementById('book-total-pages').value = '';
+            document.getElementById('book-pages-read').value = '';
+            document.getElementById('book-rating').value = '0';
+            document.getElementById('book-notes').value = '';
+            document.getElementById('book-favorite').checked = false;
+            setBookRating(0);
+            const sel = document.getElementById('book-subject');
+            sel.innerHTML = subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            openModal('book-modal');
+        }
+
+        function editBookModal(id) {
+            const b = books.find(item => item.id == id);
+            if (!b) return;
+            document.getElementById('book-id').value = b.id;
+            document.getElementById('book-modal-title').innerText = 'Edit Book';
+            document.getElementById('book-title').value = b.title;
+            document.getElementById('book-author').value = b.author;
+            document.getElementById('book-deadline').value = b.deadline || '';
+            document.getElementById('book-status').value = b.status || (b.completed ? 'completed' : 'not_started');
+            document.getElementById('book-total-pages').value = b.totalPages || '';
+            document.getElementById('book-pages-read').value = b.pagesRead || '';
+            document.getElementById('book-rating').value = b.rating || 0;
+            document.getElementById('book-notes').value = b.notes || '';
+            document.getElementById('book-favorite').checked = b.favorite || false;
+            setBookRating(b.rating || 0);
+            const sel = document.getElementById('book-subject');
+            sel.innerHTML = subjects.map(s => `<option value="${s.name}" ${s.name === b.subject ? 'selected' : ''}>${s.name}</option>`).join('');
+            openModal('book-modal');
+        }
+
+        async function saveBook(e) {
+            e.preventDefault();
+            const id = document.getElementById('book-id').value;
+            const title = document.getElementById('book-title').value;
+            const author = document.getElementById('book-author').value;
+            const subject = document.getElementById('book-subject').value;
+            const deadline = document.getElementById('book-deadline').value;
+            const status = document.getElementById('book-status').value;
+            const totalPages = parseInt(document.getElementById('book-total-pages').value) || 0;
+            const pagesRead = parseInt(document.getElementById('book-pages-read').value) || 0;
+            const rating = parseInt(document.getElementById('book-rating').value) || 0;
+            const notes = document.getElementById('book-notes').value;
+            const favorite = document.getElementById('book-favorite').checked;
+            const completed = status === 'completed';
+
+            let item;
+            if (id) {
+                const idx = books.findIndex(b => b.id == id);
+                if (idx !== -1) {
+                    Object.assign(books[idx], { title, author, subject, deadline, status, totalPages, pagesRead, rating, notes, favorite, completed });
+                    item = books[idx];
+                }
+            } else {
+                item = { id: Date.now(), title, author, subject, deadline, status, totalPages, pagesRead, rating, notes, favorite, completed, date: new Date().toISOString().split('T')[0] };
+                books.push(item);
+            }
+            await saveSupabaseItem('books', item);
+            closeModal('book-modal');
+            renderLibrary();
+            updateAllCounters();
+        }
+
+        async function toggleBookComplete(id) {
+            const idx = books.findIndex(b => b.id == id);
+            if (idx !== -1) {
+                books[idx].completed = !books[idx].completed;
+                books[idx].status = books[idx].completed ? 'completed' : 'reading';
+                if (books[idx].completed && books[idx].totalPages > 0) books[idx].pagesRead = books[idx].totalPages;
+                await saveSupabaseItem('books', books[idx]);
+                renderLibrary();
+                updateAllCounters();
+            }
+        }
+
+        async function toggleBookFavorite(id) {
+            const idx = books.findIndex(b => b.id == id);
+            if (idx !== -1) {
+                books[idx].favorite = !books[idx].favorite;
+                await saveSupabaseItem('books', books[idx]);
+                renderLibrary();
+            }
+        }
+
+        async function deleteBook(id) {
+            if (confirm('Delete this book?')) {
+                books = books.filter(b => b.id != id);
+                await deleteSupabaseItem('books', id);
+                renderLibrary();
+                updateAllCounters();
+            }
+        }
+
+        async function addBookAsTask(id) {
+            const book = books.find(b => b.id == id);
+            if (!book) return;
+            const taskItem = {
+                id: Date.now(),
+                title: `Read: ${book.title}`,
+                subject: book.subject,
+                category: 'Homework',
+                dueDate: book.deadline || new Date().toISOString().split('T')[0],
+                completed: false
+            };
+            todos.push(taskItem);
+            await saveSupabaseItem('todos', taskItem);
+            renderAll();
+            alert(`"${book.title}" added as a task!`);
+        }
+
+        function renderLibrary() {
+            const container = document.getElementById('library-list-container');
+            if (!container) return;
+
+            // Summary stats
+            const totalBooks = books.length;
+            const readingBooks = books.filter(b => b.status === 'reading').length;
+            const completedBooks = books.filter(b => b.completed).length;
+            const favBooks = books.filter(b => b.favorite).length;
+            const avgRating = books.filter(b => b.rating > 0).length > 0
+                ? (books.filter(b => b.rating > 0).reduce((a,b) => a + b.rating, 0) / books.filter(b => b.rating > 0).length).toFixed(1)
+                : '0';
+
+            let html = `
+            <!-- Library Stats Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-amber-700">${totalBooks}</p>
+                    <p class="text-[10px] font-semibold text-amber-600 uppercase">Total</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-blue-700">${readingBooks}</p>
+                    <p class="text-[10px] font-semibold text-blue-600 uppercase">Reading</p>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-emerald-700">${completedBooks}</p>
+                    <p class="text-[10px] font-semibold text-emerald-600 uppercase">Done</p>
+                </div>
+                <div class="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-rose-700">${favBooks}</p>
+                    <p class="text-[10px] font-semibold text-rose-600 uppercase">Fav</p>
+                </div>
+                <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-yellow-700">${avgRating}★</p>
+                    <p class="text-[10px] font-semibold text-yellow-600 uppercase">Avg Rating</p>
+                </div>
+            </div>
+
+            <!-- Sort/Search Bar -->
+            <div class="flex flex-wrap gap-2 mb-4 items-center">
+                <select onchange="librarySortBy=this.value; renderLibrary()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none">
+                    <option value="date" ${librarySortBy==='date'?'selected':''}>Recent</option>
+                    <option value="title" ${librarySortBy==='title'?'selected':''}>Title A-Z</option>
+                    <option value="status" ${librarySortBy==='status'?'selected':''}>Status</option>
+                    <option value="rating" ${librarySortBy==='rating'?'selected':''}>Rating</option>
+                    <option value="progress" ${librarySortBy==='progress'?'selected':''}>Progress</option>
+                </select>
+                <div class="relative flex-1 min-w-[180px]">
+                    <input type="text" oninput="librarySearchVal=this.value.toLowerCase(); renderLibrary()" placeholder="Search books..." class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                </div>
+            </div>
+            `;
+
+            // Sort
+            let sortedBooks = [...books].filter(b => {
+                if (librarySearchVal && !b.title.toLowerCase().includes(librarySearchVal) && !b.author.toLowerCase().includes(librarySearchVal)) return false;
+                return true;
+            });
+            if (librarySortBy === 'title') sortedBooks.sort((a,b) => a.title.localeCompare(b.title));
+            else if (librarySortBy === 'status') sortedBooks.sort((a,b) => (a.status||'').localeCompare(b.status||''));
+            else if (librarySortBy === 'rating') sortedBooks.sort((a,b) => (b.rating||0) - (a.rating||0));
+            else if (librarySortBy === 'progress') sortedBooks.sort((a,b) => ((b.pagesRead||0)/(b.totalPages||1)) - ((a.pagesRead||0)/(a.totalPages||1)));
+
+            // Group by subject
+            subjects.forEach(subject => {
+                const subBooks = sortedBooks.filter(b => b.subject === subject.name);
+                if (subBooks.length === 0) return;
+                const hex = getColorHex(subject.color);
+                const cClasses = getColorClasses(subject.color);
+
+                html += `
+                <div class="glass-panel p-5 rounded-3xl border border-white/50 mb-5">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-3 h-3 rounded-full" style="background-color: ${hex}"></div>
+                        <h3 class="text-sm font-bold text-slate-800">${subject.name}</h3>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${cClasses} border uppercase">${subBooks.length} Books</span>
+                    </div>
+                    <div class="space-y-3">
+                        ${subBooks.map(b => {
+                            const pct = b.totalPages > 0 ? Math.min(100, Math.round((b.pagesRead || 0) / b.totalPages * 100)) : 0;
+                            const statusLabel = b.completed ? 'Completed' : b.status === 'reading' ? 'Reading' : 'Not Started';
+                            const statusColor = b.completed ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : b.status === 'reading' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-500 border-slate-200';
+                            const stars = b.rating > 0 ? Array.from({length:5}, (_,i) => `<i class="fa-solid fa-star text-[10px] ${i < b.rating ? 'text-amber-400' : 'text-slate-200'}"></i>`).join('') : '';
+
+                            return `
+                            <div class="bg-white/40 p-3 rounded-2xl border border-white/60">
+                                <div class="flex items-start gap-3">
+                                    <button onclick="toggleBookComplete(${b.id})" class="w-6 h-6 rounded-lg border-2 ${b.completed ? 'bg-amber-600 border-amber-600' : 'border-slate-300'} flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5">
+                                        <i class="fa-solid fa-check text-xs ${b.completed ? 'text-white' : 'text-transparent'}"></i>
+                                    </button>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-0.5">
+                                            <p class="text-sm font-bold ${b.completed ? 'text-slate-400 line-through' : 'text-slate-800'} truncate">${b.title}</p>
+                                            ${b.favorite ? '<i class="fa-solid fa-heart text-rose-400 text-xs flex-shrink-0"></i>' : ''}
+                                        </div>
+                                        <p class="text-[10px] text-slate-400 mb-1.5">by ${b.author}</p>
+                                        <!-- Progress Bar -->
+                                        ${b.totalPages > 0 ? `
+                                        <div class="flex items-center gap-2 mb-1.5">
+                                            <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="h-full rounded-full transition-all duration-500 ${b.completed ? 'bg-emerald-500' : 'bg-amber-500'}" style="width: ${pct}%"></div>
+                                            </div>
+                                            <span class="text-[10px] font-bold text-slate-400">${b.pagesRead||0}/${b.totalPages} (${pct}%)</span>
+                                        </div>
+                                        ` : ''}
+                                        <!-- Status & Rating -->
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${statusColor}">${statusLabel}</span>
+                                            ${stars ? `<span class="flex gap-0.5">${stars}</span>` : ''}
+                                            ${b.deadline ? `<span class="text-[10px] text-slate-400"><i class="fa-regular fa-calendar mr-0.5"></i>${b.deadline}</span>` : ''}
+                                        </div>
+                                        ${b.notes ? `<p class="text-[10px] text-slate-500 mt-1.5 italic line-clamp-2">"${b.notes}"</p>` : ''}
+                                    </div>
+                                    <!-- Actions -->
+                                    <div class="flex flex-col gap-0.5 flex-shrink-0 ${focusSettings.editMode === false ? 'hidden' : ''}">
+                                        <button onclick="toggleBookFavorite(${b.id})" class="w-6 h-6 flex items-center justify-center ${b.favorite ? 'text-rose-500' : 'text-slate-300'} hover:text-rose-500 rounded-lg transition cursor-pointer" title="Favorite"><i class="fa-solid fa-heart text-[10px]"></i></button>
+                                        <button onclick="editBookModal(${b.id})" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-indigo-600 rounded-lg transition cursor-pointer" title="Edit"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                        <button onclick="addBookAsTask(${b.id})" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-indigo-600 rounded-lg transition cursor-pointer" title="Task"><i class="fa-solid fa-list-check text-[10px]"></i></button>
+                                        <button onclick="deleteBook(${b.id})" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-rose-600 rounded-lg transition cursor-pointer" title="Delete"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                `;
+            });
+
+            if (sortedBooks.length === 0) {
+                html += '<div class="text-center py-12 text-slate-400 text-sm">No books found. Click "Add Book" to start tracking.</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ===================== SYLLABUS SYSTEM (Enhanced) =====================
+        let syllabusSortBy = 'priority';
+        let syllabusSearchVal = '';
+
+        function openSyllabusModal() {
+            document.getElementById('syllabus-id').value = '';
+            document.getElementById('syllabus-modal-title').innerText = 'Add Syllabus Topic';
+            document.getElementById('syllabus-topic').value = '';
+            document.getElementById('syllabus-deadline').value = '';
+            document.getElementById('syllabus-priority').value = 'medium';
+            document.getElementById('syllabus-est-hours').value = '';
+            document.getElementById('syllabus-chapter').value = '';
+            document.getElementById('syllabus-notes').value = '';
+            const sel = document.getElementById('syllabus-subject');
+            sel.innerHTML = subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            openModal('syllabus-modal');
+        }
+
+        function editSyllabusModal(id) {
+            const s = syllabusTopics.find(item => item.id == id);
+            if (!s) return;
+            document.getElementById('syllabus-id').value = s.id;
+            document.getElementById('syllabus-modal-title').innerText = 'Edit Syllabus Topic';
+            document.getElementById('syllabus-topic').value = s.topic;
+            document.getElementById('syllabus-deadline').value = s.deadline || '';
+            document.getElementById('syllabus-priority').value = s.priority || 'medium';
+            document.getElementById('syllabus-est-hours').value = s.estHours || '';
+            document.getElementById('syllabus-chapter').value = s.chapter || '';
+            document.getElementById('syllabus-notes').value = s.notes || '';
+            const sel = document.getElementById('syllabus-subject');
+            sel.innerHTML = subjects.map(sub => `<option value="${sub.name}" ${sub.name === s.subject ? 'selected' : ''}>${sub.name}</option>`).join('');
+            openModal('syllabus-modal');
+        }
+
+        async function saveSyllabusTopic(e) {
+            e.preventDefault();
+            const id = document.getElementById('syllabus-id').value;
+            const topic = document.getElementById('syllabus-topic').value;
+            const subject = document.getElementById('syllabus-subject').value;
+            const deadline = document.getElementById('syllabus-deadline').value;
+            const priority = document.getElementById('syllabus-priority').value;
+            const estHours = parseFloat(document.getElementById('syllabus-est-hours').value) || 0;
+            const chapter = document.getElementById('syllabus-chapter').value;
+            const notes = document.getElementById('syllabus-notes').value;
+
+            let item;
+            if (id) {
+                const idx = syllabusTopics.findIndex(s => s.id == id);
+                if (idx !== -1) {
+                    Object.assign(syllabusTopics[idx], { topic, subject, deadline, priority, estHours, chapter, notes });
+                    item = syllabusTopics[idx];
+                }
+            } else {
+                item = { id: Date.now(), topic, subject, deadline, priority, estHours, chapter, notes, completed: false, revisions: 0, lastRevised: '', date: new Date().toISOString().split('T')[0] };
+                syllabusTopics.push(item);
+            }
+            await saveSupabaseItem('syllabus', item);
+            closeModal('syllabus-modal');
+            renderSyllabus();
+            updateAllCounters();
+        }
+
+        async function toggleSyllabusComplete(id) {
+            const idx = syllabusTopics.findIndex(s => s.id == id);
+            if (idx !== -1) {
+                syllabusTopics[idx].completed = !syllabusTopics[idx].completed;
+                await saveSupabaseItem('syllabus', syllabusTopics[idx]);
+                renderSyllabus();
+                updateAllCounters();
+            }
+        }
+
+        async function incrementRevision(id) {
+            const idx = syllabusTopics.findIndex(s => s.id == id);
+            if (idx !== -1) {
+                syllabusTopics[idx].revisions = (syllabusTopics[idx].revisions || 0) + 1;
+                syllabusTopics[idx].lastRevised = new Date().toISOString().split('T')[0];
+                await saveSupabaseItem('syllabus', syllabusTopics[idx]);
+                renderSyllabus();
+            }
+        }
+
+        async function decrementRevision(id) {
+            const idx = syllabusTopics.findIndex(s => s.id == id);
+            if (idx !== -1 && (syllabusTopics[idx].revisions || 0) > 0) {
+                syllabusTopics[idx].revisions--;
+                await saveSupabaseItem('syllabus', syllabusTopics[idx]);
+                renderSyllabus();
+            }
+        }
+
+        async function deleteSyllabusTopic(id) {
+            if (confirm('Delete this topic?')) {
+                syllabusTopics = syllabusTopics.filter(s => s.id != id);
+                await deleteSupabaseItem('syllabus', id);
+                renderSyllabus();
+                updateAllCounters();
+            }
+        }
+
+        async function addSyllabusAsTask(id) {
+            const topic = syllabusTopics.find(s => s.id == id);
+            if (!topic) return;
+            const taskItem = {
+                id: Date.now(),
+                title: `Study: ${topic.topic}`,
+                subject: topic.subject,
+                category: 'Assignment',
+                dueDate: topic.deadline || new Date().toISOString().split('T')[0],
+                completed: false
+            };
+            todos.push(taskItem);
+            await saveSupabaseItem('todos', taskItem);
+            renderAll();
+            alert(`"${topic.topic}" added as a task!`);
+        }
+
+        function renderSyllabus() {
+            const container = document.getElementById('syllabus-list-container');
+            if (!container) return;
+
+            // Summary Stats
+            const total = syllabusTopics.length;
+            const done = syllabusTopics.filter(s => s.completed).length;
+            const pending = total - done;
+            const highPri = syllabusTopics.filter(s => s.priority === 'high' && !s.completed).length;
+            const totalEstHrs = syllabusTopics.reduce((a, s) => a + (s.estHours || 0), 0);
+            const totalRevisions = syllabusTopics.reduce((a, s) => a + (s.revisions || 0), 0);
+            const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+            let html = `
+            <!-- Syllabus Stats Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <div class="bg-purple-50 border border-purple-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-purple-700">${pct}%</p>
+                    <p class="text-[10px] font-semibold text-purple-600 uppercase">Completed</p>
+                </div>
+                <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-indigo-700">${pending}</p>
+                    <p class="text-[10px] font-semibold text-indigo-600 uppercase">Pending</p>
+                </div>
+                <div class="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-rose-700">${highPri}</p>
+                    <p class="text-[10px] font-semibold text-rose-600 uppercase">High Priority</p>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl text-center">
+                    <p class="text-xl font-extrabold text-amber-700">${totalRevisions}</p>
+                    <p class="text-[10px] font-semibold text-amber-600 uppercase">Revisions</p>
+                </div>
+            </div>
+
+            <!-- Sort/Search Bar -->
+            <div class="flex flex-wrap gap-2 mb-4 items-center">
+                <select onchange="syllabusSortBy=this.value; renderSyllabus()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none">
+                    <option value="priority" ${syllabusSortBy==='priority'?'selected':''}>Priority</option>
+                    <option value="topic" ${syllabusSortBy==='topic'?'selected':''}>Name A-Z</option>
+                    <option value="deadline" ${syllabusSortBy==='deadline'?'selected':''}>Deadline</option>
+                    <option value="revisions" ${syllabusSortBy==='revisions'?'selected':''}>Revisions</option>
+                    <option value="status" ${syllabusSortBy==='status'?'selected':''}>Status</option>
+                </select>
+                <div class="relative flex-1 min-w-[180px]">
+                    <input type="text" oninput="syllabusSearchVal=this.value.toLowerCase(); renderSyllabus()" placeholder="Search topics..." class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                </div>
+            </div>
+            `;
+
+            // Sort
+            let sorted = [...syllabusTopics].filter(s => {
+                if (syllabusSearchVal && !s.topic.toLowerCase().includes(syllabusSearchVal)) return false;
+                return true;
+            });
+            const priOrder = { high: 0, medium: 1, low: 2 };
+            if (syllabusSortBy === 'priority') sorted.sort((a,b) => (priOrder[a.priority]||1) - (priOrder[b.priority]||1));
+            else if (syllabusSortBy === 'topic') sorted.sort((a,b) => a.topic.localeCompare(b.topic));
+            else if (syllabusSortBy === 'deadline') sorted.sort((a,b) => (a.deadline||'z').localeCompare(b.deadline||'z'));
+            else if (syllabusSortBy === 'revisions') sorted.sort((a,b) => (b.revisions||0) - (a.revisions||0));
+            else if (syllabusSortBy === 'status') sorted.sort((a,b) => (a.completed ? 1 : 0) - (b.completed ? 1 : 0));
+
+            // Group by subject
+            subjects.forEach(subject => {
+                const subTopics = sorted.filter(s => s.subject === subject.name);
+                if (subTopics.length === 0) return;
+                const hex = getColorHex(subject.color);
+                const cClasses = getColorClasses(subject.color);
+                const subDone = subTopics.filter(s => s.completed).length;
+                const subPct = subTopics.length > 0 ? Math.round((subDone / subTopics.length) * 100) : 0;
+                const subEstHrs = subTopics.reduce((a, s) => a + (s.estHours || 0), 0);
+                const subRevs = subTopics.reduce((a, s) => a + (s.revisions || 0), 0);
+
+                html += `
+                <div class="glass-panel p-5 rounded-3xl border border-white/50 mb-5">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full" style="background-color: ${hex}"></div>
+                            <h3 class="text-sm font-bold text-slate-800">${subject.name}</h3>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${cClasses} border uppercase">${subDone}/${subTopics.length}</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[10px] text-slate-400 font-semibold">
+                            ${subEstHrs > 0 ? `<span><i class="fa-regular fa-clock mr-0.5"></i>${subEstHrs}h est.</span>` : ''}
+                            <span><i class="fa-solid fa-rotate mr-0.5"></i>${subRevs} rev.</span>
+                        </div>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full h-2 bg-slate-100 rounded-full mb-4 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-500" style="width: ${subPct}%; background-color: ${hex}"></div>
+                    </div>
+                    <div class="space-y-3">
+                        ${subTopics.map(s => {
+                            const priColor = s.priority === 'high' ? 'bg-rose-100 text-rose-700 border-rose-200' : s.priority === 'low' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200';
+                            const priLabel = (s.priority || 'medium').charAt(0).toUpperCase() + (s.priority || 'medium').slice(1);
+
+                            return `
+                            <div class="bg-white/40 p-3 rounded-2xl border border-white/60">
+                                <div class="flex items-start gap-3">
+                                    <button onclick="toggleSyllabusComplete(${s.id})" class="w-6 h-6 rounded-lg border-2 ${s.completed ? 'bg-purple-600 border-purple-600' : 'border-slate-300'} flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5">
+                                        <i class="fa-solid fa-check text-xs ${s.completed ? 'text-white' : 'text-transparent'}"></i>
+                                    </button>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold ${s.completed ? 'text-slate-400 line-through' : 'text-slate-800'} truncate">${s.topic}</p>
+                                        ${s.chapter ? `<p class="text-[10px] text-indigo-500 font-semibold mt-0.5">${s.chapter}</p>` : ''}
+                                        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${priColor}">${priLabel}</span>
+                                            <span class="text-[10px] text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                                <i class="fa-solid fa-rotate text-[8px]"></i> ${s.revisions || 0} rev.
+                                            </span>
+                                            ${s.lastRevised ? `<span class="text-[10px] text-slate-400">Last: ${s.lastRevised}</span>` : ''}
+                                            ${s.estHours ? `<span class="text-[10px] text-slate-400"><i class="fa-regular fa-clock mr-0.5"></i>${s.estHours}h</span>` : ''}
+                                            ${s.deadline ? `<span class="text-[10px] text-slate-400"><i class="fa-regular fa-calendar mr-0.5"></i>${s.deadline}</span>` : ''}
+                                        </div>
+                                        ${s.notes ? `<p class="text-[10px] text-slate-500 mt-1.5 italic line-clamp-2">"${s.notes}"</p>` : ''}
+                                    </div>
+                                    <!-- Actions -->
+                                    <div class="flex items-center gap-0.5 flex-shrink-0">
+                                        <div class="flex items-center gap-0.5 bg-slate-50 rounded-lg px-1 py-0.5">
+                                            <button onclick="decrementRevision(${s.id})" class="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded transition cursor-pointer" title="-1"><i class="fa-solid fa-minus text-[8px]"></i></button>
+                                            <button onclick="incrementRevision(${s.id})" class="w-5 h-5 flex items-center justify-center text-purple-500 hover:text-purple-700 rounded transition cursor-pointer" title="+1"><i class="fa-solid fa-plus text-[8px]"></i></button>
+                                        </div>
+                                        <button onclick="addSyllabusAsTask(${s.id})" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-indigo-600 rounded-lg transition cursor-pointer ${focusSettings.editMode === false ? 'hidden' : ''}" title="Task"><i class="fa-solid fa-list-check text-[10px]"></i></button>
+                                        <button onclick="editSyllabusModal(${s.id})" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-indigo-600 rounded-lg transition cursor-pointer ${focusSettings.editMode === false ? 'hidden' : ''}" title="Edit"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                        <button onclick="deleteSyllabusTopic(${s.id})" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-rose-600 rounded-lg transition cursor-pointer ${focusSettings.editMode === false ? 'hidden' : ''}" title="Delete"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                `;
+            });
+
+            if (sorted.length === 0) {
+                html += '<div class="text-center py-12 text-slate-400 text-sm">No topics found. Click "Add Topic" to start tracking.</div>';
+            }
+
+            container.innerHTML = html;
         }
 
         function initChart() {
@@ -1682,7 +2804,7 @@
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [{
                         label: 'Study Hours',
-                        data: [2.5, 1.8, 3.2, 2.0, 1.5, 0, 3.2],
+                        data: [...weeklyStudyData],
                         borderColor: '#4f46e5',
                         borderWidth: 3,
                         backgroundColor: indigoGradient,
@@ -1861,7 +2983,8 @@
                     return;
                 }
 
-                const subjectNotes = notes.filter(n => n.subject === subject.name);
+                let subjectNotes = notes.filter(n => n.subject === subject.name);
+                subjectNotes = applySort(subjectNotes, notesSortBy, 'date');
                 const hex = getColorHex(subject.color);
                 const cClasses = getColorClasses(subject.color);
 
