@@ -1468,29 +1468,11 @@
     <!-- APP LOGIC -->
     <script>
         // --- CONSTANTS & DEFAULTS ---
-        const DEFAULT_SUBJECTS = [
-            { id: 'math', name: 'Mathematics', color: 'indigo' },
-            { id: 'physics', name: 'Physics', color: 'purple' },
-            { id: 'chemistry', name: 'Chemistry', color: 'pink' },
-            { id: 'history', name: 'History', color: 'amber' },
-            { id: 'cs', name: 'Computer Science', color: 'emerald' }
-        ];
+        const DEFAULT_SUBJECTS = [];
 
-        const DEFAULT_TODOS = [
-            { id: 1, title: 'Math Assignment #3', subject: 'Mathematics', category: 'Assignment', dueDate: '2026-03-24', completed: false },
-            { id: 2, title: 'Physics midterm review', subject: 'Physics', category: 'Exam', dueDate: '2026-03-25', completed: false },
-            { id: 3, title: 'Read Chapter 4 CS', subject: 'Computer Science', category: 'Homework', dueDate: '2026-03-20', completed: true }
-        ];
-
-        const DEFAULT_NOTES = [
-            { id: 1, title: 'Calculus Derivatives', driveLink: 'https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms/edit', fileId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms', fileType: 'doc', subject: 'Mathematics', date: '2026-03-12' },
-            { id: 2, title: 'Chemical Bonding Notes', driveLink: 'https://drive.google.com/file/d/1HkGYmFgVcRw3xCqZ7g1VGMO54EklTfP7/view', fileId: '1HkGYmFgVcRw3xCqZ7g1VGMO54EklTfP7', fileType: 'pdf', subject: 'Chemistry', date: '2026-03-14' }
-        ];
-
-        const DEFAULT_VIDEOS = [
-            { id: 1, title: 'Crash Course World History #1', url: 'https://www.youtube.com/watch?v=Yocja_N5s1I', videoId: 'Yocja_N5s1I', subject: 'History', date: '2026-03-01' },
-            { id: 2, title: 'Data Structures and Algorithms', url: 'https://www.youtube.com/watch?v=RBSGKlAvoiM', videoId: 'RBSGKlAvoiM', subject: 'Computer Science', date: '2026-03-05' }
-        ];
+        const DEFAULT_TODOS = [];
+        const DEFAULT_NOTES = [];
+        const DEFAULT_VIDEOS = [];
 
         const QUOTES = [
             '"The beautiful thing about learning is that no one can take it away from you."',
@@ -1545,7 +1527,7 @@
                 // 1. Fetch Subjects
                 const { data: subData, error: subErr } = await supabaseClient.from('subjects').select('*');
                 if (subErr) console.error('❌ Subjects error:', subErr);
-                else if (subData && subData.length > 0) {
+                else if (subData) {
                     subjects = subData;
                     console.log(`✅ Loaded ${subData.length} subjects`);
                 }
@@ -1615,7 +1597,7 @@
                 const { data: bookData, error: bookErr } = await supabaseClient.from('books').select('*');
                 if (bookErr) console.error('❌ Books error:', bookErr);
                 else if (bookData && bookData.length > 0) {
-                    books = bookData;
+                    books = bookData.map(fromDbBook);
                     console.log(`✅ Loaded ${bookData.length} books`);
                 }
 
@@ -1623,7 +1605,7 @@
                 const { data: sylData, error: sylErr } = await supabaseClient.from('syllabus').select('*');
                 if (sylErr) console.error('❌ Syllabus error:', sylErr);
                 else if (sylData && sylData.length > 0) {
-                    syllabusTopics = sylData;
+                    syllabusTopics = sylData.map(fromDbSyllabus);
                     console.log(`✅ Loaded ${sylData.length} syllabus topics`);
                 }
             } catch (error) {
@@ -1731,6 +1713,14 @@
                         break;
                     case 'subjects':
                         result = await supabaseClient.from('subjects').upsert(item);
+                        break;
+                    case 'books':
+                        dbItem = toDbBook(item);
+                        result = await supabaseClient.from('books').upsert(dbItem);
+                        break;
+                    case 'syllabus':
+                        dbItem = toDbSyllabus(item);
+                        result = await supabaseClient.from('syllabus').upsert(dbItem);
                         break;
                     case 'settings':
                         result = await supabaseClient.from('settings').upsert(item, { onConflict: 'key' });
@@ -2845,6 +2835,23 @@
             renderManageSubjects();
         }
 
+        // ====== SORTING UTILITY ======
+        function applySort(list, sortBy, dateField) {
+            const arr = [...list];
+            switch (sortBy) {
+                case 'newest':
+                    return arr.sort((a, b) => (b[dateField] || '').localeCompare(a[dateField] || ''));
+                case 'oldest':
+                    return arr.sort((a, b) => (a[dateField] || '').localeCompare(b[dateField] || ''));
+                case 'a-z':
+                    return arr.sort((a, b) => (a.title || a.topic || '').localeCompare(b.title || b.topic || '', 'bn', { sensitivity: 'base' }));
+                case 'z-a':
+                    return arr.sort((a, b) => (b.title || b.topic || '').localeCompare(a.title || a.topic || '', 'bn', { sensitivity: 'base' }));
+                default:
+                    return arr;
+            }
+        }
+
         function renderSubjectDropdowns() {
             const todoSel = document.getElementById('todo-subject');
             const noteSel = document.getElementById('note-subject');
@@ -3135,7 +3142,8 @@
                     return;
                 }
 
-                const subjectVideos = videos.filter(v => v.subject === subject.name);
+                let subjectVideos = videos.filter(v => v.subject === subject.name);
+                subjectVideos = applySort(subjectVideos, videosSortBy, 'date');
                 const hex = getColorHex(subject.color);
                 const cClasses = getColorClasses(subject.color);
 
